@@ -28,7 +28,7 @@ public interface CartDao {
     /**
      * 更新购物车商品数量
      */
-    Integer updateQuantity(@Param("userId") Integer userId, @Param("productId") Integer productId, @Param("quantity") Integer quantity);
+    Integer updateQuantity(@Param("userId") Integer userId, @Param("productId") Integer productId, @Param("quantity") int quantity);
     
     /**
      * 删除购物车项

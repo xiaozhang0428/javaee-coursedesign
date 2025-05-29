@@ -39,13 +39,13 @@ public class HomeController {
      * 商品列表页
      */
     @RequestMapping("/products")
-    public String products(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                          @RequestParam(value = "size", defaultValue = "12") Integer size,
+    public String products(@RequestParam(value = "page", defaultValue = "1") int page,
+                          @RequestParam(value = "size", defaultValue = "12") int size,
                           @RequestParam(value = "keyword", required = false) String keyword,
                           Model model) {
         
         List<Product> products;
-        Integer totalCount;
+        int totalCount;
         
         if (keyword != null && !keyword.trim().isEmpty()) {
             // 搜索商品
@@ -59,7 +59,7 @@ public class HomeController {
         }
         
         // 计算分页信息
-        Integer totalPages = (int) Math.ceil((double) totalCount / size);
+        int totalPages = (int) Math.ceil((double) totalCount / size);
         
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page);
