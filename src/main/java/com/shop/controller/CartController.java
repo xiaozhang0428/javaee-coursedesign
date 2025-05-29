@@ -116,6 +116,44 @@ public class CartController {
     }
     
     /**
+     * 批量删除购物车商品
+     */
+    @PostMapping("/removeBatch")
+    @ResponseBody
+    public JsonResult<String> removeBatchFromCart(@RequestParam("productIds") String productIds,
+                                                 HttpSession session) {
+        
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+        
+        if (productIds == null || productIds.trim().isEmpty()) {
+            return JsonResult.error("参数错误");
+        }
+        
+        try {
+            String[] ids = productIds.split(",");
+            boolean allSuccess = true;
+            
+            for (String idStr : ids) {
+                Integer productId = Integer.parseInt(idStr.trim());
+                if (!cartService.removeFromCart(user.getId(), productId)) {
+                    allSuccess = false;
+                }
+            }
+            
+            if (allSuccess) {
+                return JsonResult.success("删除成功");
+            } else {
+                return JsonResult.error("部分商品删除失败");
+            }
+        } catch (NumberFormatException e) {
+            return JsonResult.error("参数格式错误");
+        }
+    }
+    
+    /**
      * 清空购物车
      */
     @PostMapping("/clear")

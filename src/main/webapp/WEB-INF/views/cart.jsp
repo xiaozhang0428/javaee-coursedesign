@@ -251,7 +251,7 @@
         // 更新购物车数量
         function updateCartQuantity(cartId, quantity) {
             $.post('${pageContext.request.contextPath}/cart/update', {
-                cartId: cartId,
+                productId: cartId,
                 quantity: quantity
             }, function(result) {
                 if (result.success) {
@@ -298,7 +298,7 @@
         // 删除购物车商品
         function deleteCartItem(cartId) {
             $.post('${pageContext.request.contextPath}/cart/remove', {
-                cartId: cartId
+                productId: cartId
             }, function(result) {
                 if (result.success) {
                     $('.cart-item[data-cart-id="' + cartId + '"]').fadeOut(function() {
@@ -323,7 +323,7 @@
         // 批量删除购物车商品
         function deleteCartItems(cartIds) {
             $.post('${pageContext.request.contextPath}/cart/removeBatch', {
-                cartIds: cartIds.join(',')
+                productIds: cartIds.join(',')
             }, function(result) {
                 if (result.success) {
                     cartIds.forEach(function(cartId) {
