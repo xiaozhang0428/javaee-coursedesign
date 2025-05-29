@@ -211,11 +211,11 @@
             });
         });
         
-        // 更新购物车数量
+        // 更新购物车数量 - 使用header.jsp中定义的函数
         function updateCartCount() {
             $.get('${pageContext.request.contextPath}/cart/count', function(result) {
                 if (result.success) {
-                    $('.cart-count').text(result.data);
+                    $('#cartCount').text(result.data);
                 }
             });
         }

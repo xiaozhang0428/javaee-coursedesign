@@ -358,9 +358,36 @@
                 showMessage('请先选择要结算的商品', 'warning');
                 return;
             }
-            
-            // 这里可以跳转到结算页面
-            showMessage('结算功能开发中...', 'info');
+
+            // 获取选中商品的ID
+            var productIds = [];
+            selectedItems.each(function() {
+                productIds.push($(this).val());
+            });
+
+            // 确认结算
+            if (confirm('确认要结算选中的商品吗？')) {
+                var button = $(this);
+                showLoading(button[0]);
+                
+                $.post('${pageContext.request.contextPath}/cart/checkout', {
+                    productIds: productIds.join(',')
+                }, function(result) {
+                    hideLoading(button[0]);
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        // 刷新页面显示最新的购物车状态
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showMessage(result.message, 'error');
+                    }
+                }).fail(function() {
+                    hideLoading(button[0]);
+                    showMessage('结算失败，请稍后重试', 'error');
+                });
+            }
         });
         
         // 初始化
