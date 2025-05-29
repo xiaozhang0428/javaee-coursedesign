@@ -48,12 +48,12 @@
                             </div>
                             <div class="card-body p-0">
                                 <c:forEach var="item" items="${cartItems}">
-                                    <div class="cart-item" data-cart-id="${item.id}">
+                                    <div class="cart-item" data-cart-id="${item.productId}">
                                         <div class="row align-items-center p-3">
                                             <div class="col-auto">
                                                 <div class="form-check">
                                                     <input class="form-check-input item-checkbox" type="checkbox" 
-                                                           value="${item.id}" data-price="${item.product.price}">
+                                                           value="${item.productId}" data-price="${item.product.price}">
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -83,13 +83,13 @@
                                             <div class="col-auto">
                                                 <div class="input-group" style="width: 120px;">
                                                     <button class="btn btn-outline-secondary btn-sm quantity-btn" 
-                                                            type="button" data-action="decrease" data-cart-id="${item.id}">
+                                                            type="button" data-action="decrease" data-cart-id="${item.productId}">
                                                         <i class="fas fa-minus"></i>
                                                     </button>
                                                     <input type="number" class="form-control form-control-sm text-center quantity-input" 
-                                                           value="${item.quantity}" min="1" max="99" data-cart-id="${item.id}">
+                                                           value="${item.quantity}" min="1" max="99" data-cart-id="${item.productId}">
                                                     <button class="btn btn-outline-secondary btn-sm quantity-btn" 
-                                                            type="button" data-action="increase" data-cart-id="${item.id}">
+                                                            type="button" data-action="increase" data-cart-id="${item.productId}">
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
@@ -101,7 +101,7 @@
                                             </div>
                                             <div class="col-auto">
                                                 <button class="btn btn-outline-danger btn-sm delete-item" 
-                                                        data-cart-id="${item.id}">
+                                                        data-cart-id="${item.productId}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
