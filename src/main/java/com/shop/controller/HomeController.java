@@ -42,6 +42,7 @@ public class HomeController {
     public String products(@RequestParam(value = "page", defaultValue = "1") int page,
                           @RequestParam(value = "size", defaultValue = "12") int size,
                           @RequestParam(value = "keyword", required = false) String keyword,
+                          @RequestParam(value = "sort", required = false) String sort,
                           Model model) {
         
         List<Product> products;
@@ -49,12 +50,12 @@ public class HomeController {
         
         if (keyword != null && !keyword.trim().isEmpty()) {
             // 搜索商品
-            products = productService.searchProducts(keyword);
+            products = productService.searchProducts(keyword, sort);
             totalCount = products.size();
             model.addAttribute("keyword", keyword);
         } else {
             // 分页查询所有商品
-            products = productService.findByPage(page, size);
+            products = productService.findByPage(page, size, sort);
             totalCount = productService.getTotalCount();
         }
         
@@ -65,6 +66,7 @@ public class HomeController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalCount", totalCount);
+        model.addAttribute("sort", sort);
         
         return "products";
     }

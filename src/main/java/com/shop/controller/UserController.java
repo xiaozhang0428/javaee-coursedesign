@@ -171,4 +171,67 @@ public class UserController {
             return JsonResult.error("更新失败");
         }
     }
+    
+    /**
+     * 我的订单页面
+     */
+    @RequestMapping("/orders")
+    public String orders(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/user/login";
+        }
+        
+        // 这里可以添加订单查询逻辑
+        // List<Order> orders = orderService.findByUserId(user.getId());
+        // model.addAttribute("orders", orders);
+        
+        return "orders";
+    }
+    
+    /**
+     * 修改密码
+     */
+    @PostMapping("/changePassword")
+    @ResponseBody
+    public JsonResult<String> changePassword(@RequestParam("oldPassword") String oldPassword,
+                                            @RequestParam("newPassword") String newPassword,
+                                            @RequestParam("confirmPassword") String confirmPassword,
+                                            HttpSession session) {
+        
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) {
+            return JsonResult.error("请先登录");
+        }
+        
+        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+            return JsonResult.error("原密码不能为空");
+        }
+        
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return JsonResult.error("新密码不能为空");
+        }
+        
+        if (!newPassword.equals(confirmPassword)) {
+            return JsonResult.error("两次密码输入不一致");
+        }
+        
+        if (newPassword.length() < 6) {
+            return JsonResult.error("新密码长度不能少于6位");
+        }
+        
+        // 验证原密码
+        User user = userService.findById(sessionUser.getId());
+        if (!user.getPassword().equals(oldPassword)) {
+            return JsonResult.error("原密码错误");
+        }
+        
+        // 更新密码
+        user.setPassword(newPassword);
+        if (userService.updateUser(user)) {
+            return JsonResult.success("密码修改成功");
+        } else {
+            return JsonResult.error("密码修改失败");
+        }
+    }
 }
