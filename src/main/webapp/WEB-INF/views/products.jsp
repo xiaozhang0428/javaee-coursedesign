@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -44,9 +45,8 @@
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card product-card h-100">
                         <div class="card-img-top-wrapper">
-                            <img src="${pageContext.request.contextPath}/static/images/products/${product.image}" 
-                                 class="card-img-top" alt="${product.name}"
-                                 onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
+                            <img src="${pageContext.request.contextPath}/static/images/products/default.jpg" 
+                                 class="card-img-top" alt="${product.name}">
                         </div>
                         <div class="card-body d-flex flex-column">
                             <h6 class="card-title">${product.name}</h6>
