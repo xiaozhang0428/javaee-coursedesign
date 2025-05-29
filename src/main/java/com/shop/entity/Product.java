@@ -13,6 +13,7 @@ public class Product {
     private BigDecimal price;
     private Integer stock;
     private Integer sales;
+    private String image;
     private Integer status;
     private Integer categoryId;
     private Date createTime;
@@ -78,6 +79,14 @@ public class Product {
         this.sales = sales;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -111,6 +120,7 @@ public class Product {
                 ", price=" + price +
                 ", stock=" + stock +
                 ", sales=" + sales +
+                ", image='" + image + '\'' +
                 ", status=" + status +
                 ", categoryId=" + categoryId +
                 ", createTime=" + createTime +
