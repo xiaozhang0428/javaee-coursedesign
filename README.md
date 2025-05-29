@@ -11,7 +11,7 @@
 - **后端框架**: Spring 5.3.21 + SpringMVC
 - **持久层**: MyBatis 3.5.10
 - **数据库**: MariaDB 10.6+
-- **连接池**: Druid 1.2.11
+- **数据源**: Spring DriverManagerDataSource
 - **前端**: Bootstrap 5.1.3 + jQuery 3.6.0
 - **构建工具**: Maven 3.6+
 - **JDK版本**: 1.8+
