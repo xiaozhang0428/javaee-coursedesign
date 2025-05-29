@@ -37,6 +37,14 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    public List<Product> searchProducts(String keyword, String sort) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findByPage(1, 100, sort); // 返回前100个商品
+        }
+        return productMapper.searchByKeywordWithSort(keyword.trim(), sort);
+    }
+    
+    @Override
     public List<Product> findHotProducts(int limit) {
         if (limit <= 0) {
             limit = 10;
@@ -62,6 +70,18 @@ public class ProductServiceImpl implements ProductService {
         }
         int offset = (page - 1) * size;
         return productMapper.findByPage(offset, size);
+    }
+    
+    @Override
+    public List<Product> findByPage(int page, int size, String sort) {
+        if (page < 1) {
+            page = 1;
+        }
+        if (size <= 0) {
+            size = 10;
+        }
+        int offset = (page - 1) * size;
+        return productMapper.findByPageWithSort(offset, size, sort);
     }
     
     @Override

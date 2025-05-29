@@ -26,6 +26,11 @@ public interface ProductMapper {
     List<Product> searchByKeyword(@Param("keyword") String keyword);
     
     /**
+     * 根据关键字搜索商品（带排序）
+     */
+    List<Product> searchByKeywordWithSort(@Param("keyword") String keyword, @Param("sort") String sort);
+    
+    /**
      * 查询热销商品
      */
     List<Product> findHotProducts(@Param("limit") int limit);
@@ -39,6 +44,11 @@ public interface ProductMapper {
      * 分页查询商品
      */
     List<Product> findByPage(@Param("offset") int offset, @Param("limit") int limit);
+    
+    /**
+     * 分页查询商品（带排序）
+     */
+    List<Product> findByPageWithSort(@Param("offset") int offset, @Param("limit") int limit, @Param("sort") String sort);
     
     /**
      * 统计商品总数

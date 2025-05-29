@@ -25,6 +25,11 @@ public interface ProductService {
     List<Product> searchProducts(String keyword);
     
     /**
+     * 搜索商品（带排序）
+     */
+    List<Product> searchProducts(String keyword, String sort);
+    
+    /**
      * 查询热销商品
      */
     List<Product> findHotProducts(int limit);
@@ -38,6 +43,11 @@ public interface ProductService {
      * 分页查询商品
      */
     List<Product> findByPage(int page, int size);
+    
+    /**
+     * 分页查询商品（带排序）
+     */
+    List<Product> findByPage(int page, int size, String sort);
     
     /**
      * 统计商品总数

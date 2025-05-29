@@ -31,6 +31,28 @@
         ORDER BY sales DESC, create_time DESC
     </select>
 
+    <select id="searchByKeywordWithSort" resultMap="ProductResultMap">
+        SELECT * FROM products 
+        WHERE status = 1 AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        <choose>
+            <when test="sort == 'price_asc'">
+                ORDER BY price ASC
+            </when>
+            <when test="sort == 'price_desc'">
+                ORDER BY price DESC
+            </when>
+            <when test="sort == 'sales_desc'">
+                ORDER BY sales DESC
+            </when>
+            <when test="sort == 'create_time_desc'">
+                ORDER BY create_time DESC
+            </when>
+            <otherwise>
+                ORDER BY sales DESC, create_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
     <select id="findHotProducts" parameterType="int" resultMap="ProductResultMap">
         SELECT * FROM products WHERE status = 1 ORDER BY sales DESC LIMIT #{limit}
     </select>
@@ -41,6 +63,28 @@
 
     <select id="findByPage" resultMap="ProductResultMap">
         SELECT * FROM products WHERE status = 1 ORDER BY create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="findByPageWithSort" resultMap="ProductResultMap">
+        SELECT * FROM products WHERE status = 1 
+        <choose>
+            <when test="sort == 'price_asc'">
+                ORDER BY price ASC
+            </when>
+            <when test="sort == 'price_desc'">
+                ORDER BY price DESC
+            </when>
+            <when test="sort == 'sales_desc'">
+                ORDER BY sales DESC
+            </when>
+            <when test="sort == 'create_time_desc'">
+                ORDER BY create_time DESC
+            </when>
+            <otherwise>
+                ORDER BY create_time DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{limit}
     </select>
 
     <select id="countAll" resultType="int">
