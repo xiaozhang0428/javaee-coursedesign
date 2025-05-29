@@ -46,8 +46,8 @@ public class CartController {
      */
     @PostMapping("/add")
     @ResponseBody
-    public JsonResult<String> addToCart(@RequestParam Integer productId,
-                                       @RequestParam(defaultValue = "1") Integer quantity,
+    public JsonResult<String> addToCart(@RequestParam("productId") Integer productId,
+                                       @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
                                        HttpSession session) {
         
         User user = (User) session.getAttribute("user");
@@ -71,8 +71,8 @@ public class CartController {
      */
     @PostMapping("/update")
     @ResponseBody
-    public JsonResult<String> updateQuantity(@RequestParam Integer productId,
-                                            @RequestParam Integer quantity,
+    public JsonResult<String> updateQuantity(@RequestParam("productId") Integer productId,
+                                            @RequestParam("quantity") Integer quantity,
                                             HttpSession session) {
         
         User user = (User) session.getAttribute("user");
@@ -96,7 +96,7 @@ public class CartController {
      */
     @PostMapping("/remove")
     @ResponseBody
-    public JsonResult<String> removeFromCart(@RequestParam Integer productId,
+    public JsonResult<String> removeFromCart(@RequestParam("productId") Integer productId,
                                             HttpSession session) {
         
         User user = (User) session.getAttribute("user");
