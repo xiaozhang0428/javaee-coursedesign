@@ -12,6 +12,11 @@ import java.util.List;
 public interface OrderDao {
     
     /**
+     * 查询所有订单
+     */
+    List<Order> findAll();
+    
+    /**
      * 根据ID查询订单
      */
     Order findById(Integer id);
@@ -22,6 +27,11 @@ public interface OrderDao {
     List<Order> findByUserId(Integer userId);
     
     /**
+     * 根据状态查询订单
+     */
+    List<Order> findByStatus(Integer status);
+    
+    /**
      * 根据用户ID和日期范围查询订单
      */
     List<Order> findByUserIdAndDateRange(@Param("userId") Integer userId, 
@@ -29,9 +39,29 @@ public interface OrderDao {
                                         @Param("endDate") Date endDate);
     
     /**
+     * 分页查询订单
+     */
+    List<Order> findByPage(@Param("offset") Integer offset, @Param("size") Integer size);
+    
+    /**
+     * 统计订单总数
+     */
+    Integer countAll();
+    
+    /**
+     * 根据用户ID统计订单数
+     */
+    Integer countByUserId(Integer userId);
+    
+    /**
      * 添加订单
      */
     Integer insert(Order order);
+    
+    /**
+     * 更新订单
+     */
+    Integer update(Order order);
     
     /**
      * 更新订单状态
@@ -42,4 +72,9 @@ public interface OrderDao {
      * 删除订单
      */
     Integer deleteById(Integer id);
+    
+    /**
+     * 根据用户ID删除订单
+     */
+    Integer deleteByUserId(Integer userId);
 }
