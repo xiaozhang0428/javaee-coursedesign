@@ -16,13 +16,14 @@
             <result property="stock" column="p_stock"/>
             <result property="sales" column="p_sales"/>
             <result property="status" column="p_status"/>
+            <result property="image" column="p_image"/>
         </association>
     </resultMap>
 
     <select id="findByUserId" parameterType="int" resultMap="CartResultMap">
         SELECT c.user_id, c.product_id, c.quantity,
                p.id as p_id, p.name as p_name, p.description as p_description, 
-               p.price as p_price, p.stock as p_stock, p.sales as p_sales, p.status as p_status
+               p.price as p_price, p.stock as p_stock, p.sales as p_sales, p.status as p_status, p.image as p_image
         FROM carts c 
         LEFT JOIN products p ON c.product_id = p.id
         WHERE c.user_id = #{userId} AND p.status = 1
