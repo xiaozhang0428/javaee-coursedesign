@@ -11,6 +11,7 @@
         <result property="price" column="price"/>
         <result property="stock" column="stock"/>
         <result property="sales" column="sales"/>
+        <result property="image" column="image"/>
         <result property="status" column="status"/>
         <result property="categoryId" column="category_id"/>
         <result property="createTime" column="create_time"/>
@@ -47,8 +48,8 @@
     </select>
 
     <insert id="insert" parameterType="com.shop.entity.Product" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO products (name, description, price, stock, sales, status, category_id, create_time)
-        VALUES (#{name}, #{description}, #{price}, #{stock}, #{sales}, #{status}, #{categoryId}, #{createTime})
+        INSERT INTO products (name, description, price, stock, sales, image, status, category_id, create_time)
+        VALUES (#{name}, #{description}, #{price}, #{stock}, #{sales}, #{image}, #{status}, #{categoryId}, #{createTime})
     </insert>
 
     <update id="update" parameterType="com.shop.entity.Product">
@@ -57,6 +58,7 @@
             description = #{description},
             price = #{price},
             stock = #{stock},
+            image = #{image},
             status = #{status},
             category_id = #{categoryId}
         WHERE id = #{id}
