@@ -1,4 +1,4 @@
-package com.shop.dao;
+package com.shop.mapper;
 
 import com.shop.entity.Order;
 import org.apache.ibatis.annotations.Param;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 订单数据访问接口
  */
-public interface OrderDao {
+public interface OrderMapper {
     
     /**
      * 查询所有订单

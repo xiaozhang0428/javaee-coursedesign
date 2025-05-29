@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.shop.dao.UserDao">
+<mapper namespace="com.shop.mapper.UserMapper">
     
     <resultMap id="UserResultMap" type="com.shop.entity.User">
         <id property="id" column="id"/>

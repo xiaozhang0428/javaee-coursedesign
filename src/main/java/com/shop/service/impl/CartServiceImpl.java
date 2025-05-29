@@ -1,7 +1,7 @@
 package com.shop.service.impl;
 
-import com.shop.dao.CartDao;
-import com.shop.dao.ProductDao;
+import com.shop.mapper.CartMapper;
+import com.shop.mapper.ProductMapper;
 import com.shop.entity.Cart;
 import com.shop.entity.Product;
 import com.shop.service.CartService;
@@ -18,17 +18,17 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     
     @Autowired
-    private CartDao cartDao;
+    private CartMapper cartMapper;
     
     @Autowired
-    private ProductDao productDao;
+    private ProductMapper productMapper;
     
     @Override
     public List<Cart> findByUserId(Integer userId) {
         if (userId == null) {
             return null;
         }
-        return cartDao.findByUserId(userId);
+        return cartMapper.findByUserId(userId);
     }
     
     @Override
@@ -38,24 +38,24 @@ public class CartServiceImpl implements CartService {
         }
         
         // 检查商品是否存在且有库存
-        Product product = productDao.findById(productId);
+        Product product = productMapper.findById(productId);
         if (product == null || product.getStatus() != 1 || product.getStock() < quantity) {
             return false;
         }
         
         // 检查购物车中是否已有该商品
-        Cart existingCart = cartDao.findByUserIdAndProductId(userId, productId);
+        Cart existingCart = cartMapper.findByUserIdAndProductId(userId, productId);
         if (existingCart != null) {
             // 更新数量
             int newQuantity = existingCart.getQuantity() + quantity;
             if (newQuantity > product.getStock()) {
                 return false;
             }
-            return cartDao.updateQuantity(userId, productId, newQuantity) > 0;
+            return cartMapper.updateQuantity(userId, productId, newQuantity) > 0;
         } else {
             // 新增购物车项
             Cart cart = new Cart(userId, productId, quantity);
-            return cartDao.insert(cart) > 0;
+            return cartMapper.insert(cart) > 0;
         }
     }
     
@@ -66,12 +66,12 @@ public class CartServiceImpl implements CartService {
         }
         
         // 检查库存
-        Product product = productDao.findById(productId);
+        Product product = productMapper.findById(productId);
         if (product == null || product.getStock() < quantity) {
             return false;
         }
         
-        return cartDao.updateQuantity(userId, productId, quantity) > 0;
+        return cartMapper.updateQuantity(userId, productId, quantity) > 0;
     }
     
     @Override
@@ -79,7 +79,7 @@ public class CartServiceImpl implements CartService {
         if (userId == null || productId == null) {
             return false;
         }
-        return cartDao.deleteByUserIdAndProductId(userId, productId) > 0;
+        return cartMapper.deleteByUserIdAndProductId(userId, productId) > 0;
     }
     
     @Override
@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
         if (userId == null) {
             return false;
         }
-        return cartDao.deleteByUserId(userId) > 0;
+        return cartMapper.deleteByUserId(userId) > 0;
     }
     
     @Override

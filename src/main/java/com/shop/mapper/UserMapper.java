@@ -1,4 +1,4 @@
-package com.shop.dao;
+package com.shop.mapper;
 
 import com.shop.entity.User;
 import org.apache.ibatis.annotations.Param;
@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * 用户数据访问接口
  */
-public interface UserDao {
+public interface UserMapper {
     
     /**
      * 根据ID查询用户

@@ -1,6 +1,6 @@
 package com.shop.service.impl;
 
-import com.shop.dao.ProductDao;
+import com.shop.mapper.ProductMapper;
 import com.shop.entity.Product;
 import com.shop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,16 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     
     @Autowired
-    private ProductDao productDao;
+    private ProductMapper productMapper;
     
     @Override
     public List<Product> findAll() {
-        return productDao.findAll();
+        return productMapper.findAll();
     }
     
     @Override
     public Product findById(Integer id) {
-        return productDao.findById(id);
+        return productMapper.findById(id);
     }
     
     @Override
@@ -33,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return findAll();
         }
-        return productDao.searchByKeyword(keyword.trim());
+        return productMapper.searchByKeyword(keyword.trim());
     }
     
     @Override
@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
         if (limit <= 0) {
             limit = 10;
         }
-        return productDao.findHotProducts(limit);
+        return productMapper.findHotProducts(limit);
     }
     
     @Override
@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
         if (limit <= 0) {
             limit = 10;
         }
-        return productDao.findLatestProducts(limit);
+        return productMapper.findLatestProducts(limit);
     }
     
     @Override
@@ -61,12 +61,12 @@ public class ProductServiceImpl implements ProductService {
             size = 10;
         }
         int offset = (page - 1) * size;
-        return productDao.findByPage(offset, size);
+        return productMapper.findByPage(offset, size);
     }
     
     @Override
     public int getTotalCount() {
-        return productDao.countAll();
+        return productMapper.countAll();
     }
     
     @Override
@@ -81,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
         if (product.getSales() == null) {
             product.setSales(0);
         }
-        return productDao.insert(product) > 0;
+        return productMapper.insert(product) > 0;
     }
     
     @Override
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
         if (product == null || product.getId() == null) {
             return false;
         }
-        return productDao.update(product) > 0;
+        return productMapper.update(product) > 0;
     }
     
     @Override
@@ -97,6 +97,6 @@ public class ProductServiceImpl implements ProductService {
         if (id == null) {
             return false;
         }
-        return productDao.deleteById(id) > 0;
+        return productMapper.deleteById(id) > 0;
     }
 }

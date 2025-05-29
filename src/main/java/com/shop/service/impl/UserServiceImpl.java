@@ -1,6 +1,6 @@
 package com.shop.service.impl;
 
-import com.shop.dao.UserDao;
+import com.shop.mapper.UserMapper;
 import com.shop.entity.User;
 import com.shop.service.UserService;
 import com.shop.util.MD5Util;
@@ -16,7 +16,7 @@ import java.util.Date;
 public class UserServiceImpl implements UserService {
     
     @Autowired
-    private UserDao userDao;
+    private UserMapper userMapper;
     
     @Override
     public User login(String username, String password) {
@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         String encryptedPassword = MD5Util.encrypt(password);
-        return userDao.findByUsernameAndPassword(username, encryptedPassword);
+        return userMapper.findByUsernameAndPassword(username, encryptedPassword);
     }
     
     @Override
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(MD5Util.encrypt(user.getPassword()));
         user.setCreateTime(new Date());
         
-        return userDao.insert(user) > 0;
+        return userMapper.insert(user) > 0;
     }
     
     @Override
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         if (id == null) {
             return null;
         }
-        return userDao.findById(id);
+        return userMapper.findById(id);
     }
     
     @Override
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         if (user == null || user.getId() == null) {
             return false;
         }
-        return userDao.update(user) > 0;
+        return userMapper.update(user) > 0;
     }
     
     @Override
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
         if (username == null) {
             return false;
         }
-        return userDao.countByUsername(username) > 0;
+        return userMapper.countByUsername(username) > 0;
     }
     
     @Override
@@ -79,6 +79,6 @@ public class UserServiceImpl implements UserService {
         if (email == null) {
             return false;
         }
-        return userDao.countByEmail(email) > 0;
+        return userMapper.countByEmail(email) > 0;
     }
 }

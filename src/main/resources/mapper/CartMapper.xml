@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.shop.dao.CartDao">
+<mapper namespace="com.shop.mapper.CartMapper">
     
     <resultMap id="CartResultMap" type="com.shop.entity.Cart">
         <result property="userId" column="user_id"/>

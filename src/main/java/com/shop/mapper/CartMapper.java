@@ -1,4 +1,4 @@
-package com.shop.dao;
+package com.shop.mapper;
 
 import com.shop.entity.Cart;
 import org.apache.ibatis.annotations.Param;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 购物车数据访问接口
  */
-public interface CartDao {
+public interface CartMapper {
     
     /**
      * 根据用户ID查询购物车

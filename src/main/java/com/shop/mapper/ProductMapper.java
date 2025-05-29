@@ -1,4 +1,4 @@
-package com.shop.dao;
+package com.shop.mapper;
 
 import com.shop.entity.Product;
 import org.apache.ibatis.annotations.Param;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 商品数据访问接口
  */
-public interface ProductDao {
+public interface ProductMapper {
     
     /**
      * 查询所有商品
