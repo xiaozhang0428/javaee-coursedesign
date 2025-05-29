@@ -2,7 +2,9 @@ package com.shop.controller;
 
 import com.shop.entity.Cart;
 import com.shop.entity.User;
+import com.shop.entity.Order;
 import com.shop.service.CartService;
+import com.shop.service.OrderService;
 import com.shop.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 购物车控制器
@@ -21,6 +24,9 @@ public class CartController {
     
     @Autowired
     private CartService cartService;
+    
+    @Autowired
+    private OrderService orderService;
     
     /**
      * 购物车页面
@@ -191,5 +197,43 @@ public class CartController {
         }
         
         return JsonResult.success(count);
+    }
+    
+    /**
+     * 结算购物车商品
+     */
+    @PostMapping("/checkout")
+    @ResponseBody
+    public JsonResult<String> checkout(@RequestParam("productIds") String productIds,
+                                     HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+        
+        if (productIds == null || productIds.trim().isEmpty()) {
+            return JsonResult.error("请选择要结算的商品");
+        }
+        
+        try {
+            String[] ids = productIds.split(",");
+            List<Integer> productIdList = new ArrayList<>();
+            
+            for (String idStr : ids) {
+                productIdList.add(Integer.parseInt(idStr.trim()));
+            }
+            
+            Order order = orderService.createOrder(user.getId(), productIdList);
+            
+            if (order != null) {
+                return JsonResult.success("订单创建成功，订单号：" + order.getId());
+            } else {
+                return JsonResult.error("订单创建失败");
+            }
+        } catch (NumberFormatException e) {
+            return JsonResult.error("参数格式错误");
+        } catch (Exception e) {
+            return JsonResult.error("系统错误：" + e.getMessage());
+        }
     }
 }
