@@ -47,7 +47,7 @@ public class CartController {
     @PostMapping("/add")
     @ResponseBody
     public JsonResult<String> addToCart(@RequestParam("productId") Integer productId,
-                                       @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
+                                       @RequestParam(value = "quantity", defaultValue = "1") int quantity,
                                        HttpSession session) {
         
         User user = (User) session.getAttribute("user");
@@ -55,7 +55,7 @@ public class CartController {
             return JsonResult.error("请先登录");
         }
         
-        if (productId == null || quantity == null || quantity <= 0) {
+        if (productId == null || quantity <= 0) {
             return JsonResult.error("参数错误");
         }
         
@@ -72,7 +72,7 @@ public class CartController {
     @PostMapping("/update")
     @ResponseBody
     public JsonResult<String> updateQuantity(@RequestParam("productId") Integer productId,
-                                            @RequestParam("quantity") Integer quantity,
+                                            @RequestParam("quantity") int quantity,
                                             HttpSession session) {
         
         User user = (User) session.getAttribute("user");
@@ -80,7 +80,7 @@ public class CartController {
             return JsonResult.error("请先登录");
         }
         
-        if (productId == null || quantity == null || quantity <= 0) {
+        if (productId == null || quantity <= 0) {
             return JsonResult.error("参数错误");
         }
         

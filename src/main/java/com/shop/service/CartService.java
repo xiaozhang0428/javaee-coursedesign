@@ -17,12 +17,12 @@ public interface CartService {
     /**
      * 添加商品到购物车
      */
-    boolean addToCart(Integer userId, Integer productId, Integer quantity);
+    boolean addToCart(Integer userId, Integer productId, int quantity);
     
     /**
      * 更新购物车商品数量
      */
-    boolean updateQuantity(Integer userId, Integer productId, Integer quantity);
+    boolean updateQuantity(Integer userId, Integer productId, int quantity);
     
     /**
      * 从购物车删除商品

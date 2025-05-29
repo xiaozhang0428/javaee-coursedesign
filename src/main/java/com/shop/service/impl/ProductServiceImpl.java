@@ -37,35 +37,35 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public List<Product> findHotProducts(Integer limit) {
-        if (limit == null || limit <= 0) {
+    public List<Product> findHotProducts(int limit) {
+        if (limit <= 0) {
             limit = 10;
         }
         return productDao.findHotProducts(limit);
     }
     
     @Override
-    public List<Product> findLatestProducts(Integer limit) {
-        if (limit == null || limit <= 0) {
+    public List<Product> findLatestProducts(int limit) {
+        if (limit <= 0) {
             limit = 10;
         }
         return productDao.findLatestProducts(limit);
     }
     
     @Override
-    public List<Product> findByPage(Integer page, Integer size) {
-        if (page == null || page < 1) {
+    public List<Product> findByPage(int page, int size) {
+        if (page < 1) {
             page = 1;
         }
-        if (size == null || size <= 0) {
+        if (size <= 0) {
             size = 10;
         }
-        Integer offset = (page - 1) * size;
+        int offset = (page - 1) * size;
         return productDao.findByPage(offset, size);
     }
     
     @Override
-    public Integer getTotalCount() {
+    public int getTotalCount() {
         return productDao.countAll();
     }
     

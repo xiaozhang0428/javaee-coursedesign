@@ -10,7 +10,6 @@
         <result property="userId" column="user_id"/>
         <result property="totalAmount" column="total_amount"/>
         <result property="status" column="status"/>
-        <result property="shippingAddress" column="shipping_address"/>
         <result property="createTime" column="create_time"/>
         
         <!-- 关联用户信息 -->
@@ -27,10 +26,8 @@
             <id property="id" column="item_id"/>
             <result property="orderId" column="order_id"/>
             <result property="productId" column="product_id"/>
-            <result property="productName" column="product_name"/>
-            <result property="productPrice" column="product_price"/>
             <result property="quantity" column="quantity"/>
-            <result property="subtotal" column="subtotal"/>
+            <result property="price" column="price"/>
         </collection>
     </resultMap>
 
@@ -45,8 +42,7 @@
     <!-- 根据ID查询订单 -->
     <select id="findById" parameterType="Integer" resultMap="OrderResultMap">
         SELECT o.*, u.username, u.email, u.phone, u.address,
-               oi.id as item_id, oi.product_id, oi.product_name, 
-               oi.product_price, oi.quantity, oi.subtotal
+               oi.id as item_id, oi.product_id, oi.quantity, oi.price
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         LEFT JOIN order_items oi ON o.id = oi.order_id
@@ -96,19 +92,19 @@
     </select>
 
     <!-- 统计订单总数 -->
-    <select id="countAll" resultType="Integer">
+    <select id="countAll" resultType="int">
         SELECT COUNT(*) FROM orders
     </select>
 
     <!-- 根据用户ID统计订单数 -->
-    <select id="countByUserId" parameterType="Integer" resultType="Integer">
+    <select id="countByUserId" parameterType="Integer" resultType="int">
         SELECT COUNT(*) FROM orders WHERE user_id = #{userId}
     </select>
 
     <!-- 插入订单 -->
     <insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO orders (user_id, total_amount, status, shipping_address, create_time)
-        VALUES (#{userId}, #{totalAmount}, #{status}, #{shippingAddress}, #{createTime})
+        INSERT INTO orders (user_id, total_amount, status, create_time)
+        VALUES (#{userId}, #{totalAmount}, #{status}, #{createTime})
     </insert>
 
     <!-- 更新订单 -->
@@ -117,7 +113,6 @@
         <set>
             <if test="totalAmount != null">total_amount = #{totalAmount},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="shippingAddress != null">shipping_address = #{shippingAddress},</if>
         </set>
         WHERE id = #{id}
     </update>

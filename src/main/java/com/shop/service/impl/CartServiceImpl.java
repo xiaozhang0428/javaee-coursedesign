@@ -32,8 +32,8 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
-    public boolean addToCart(Integer userId, Integer productId, Integer quantity) {
-        if (userId == null || productId == null || quantity == null || quantity <= 0) {
+    public boolean addToCart(Integer userId, Integer productId, int quantity) {
+        if (userId == null || productId == null || quantity <= 0) {
             return false;
         }
         
@@ -47,7 +47,7 @@ public class CartServiceImpl implements CartService {
         Cart existingCart = cartDao.findByUserIdAndProductId(userId, productId);
         if (existingCart != null) {
             // 更新数量
-            Integer newQuantity = existingCart.getQuantity() + quantity;
+            int newQuantity = existingCart.getQuantity() + quantity;
             if (newQuantity > product.getStock()) {
                 return false;
             }
@@ -60,8 +60,8 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
-    public boolean updateQuantity(Integer userId, Integer productId, Integer quantity) {
-        if (userId == null || productId == null || quantity == null || quantity <= 0) {
+    public boolean updateQuantity(Integer userId, Integer productId, int quantity) {
+        if (userId == null || productId == null || quantity <= 0) {
             return false;
         }
         

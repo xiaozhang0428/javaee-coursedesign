@@ -41,10 +41,10 @@ public interface UserDao {
     /**
      * 检查用户名是否存在
      */
-    Integer countByUsername(String username);
+    int countByUsername(String username);
     
     /**
      * 检查邮箱是否存在
      */
-    Integer countByEmail(String email);
+    int countByEmail(String email);
 }

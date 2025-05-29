@@ -27,22 +27,22 @@ public interface ProductService {
     /**
      * 查询热销商品
      */
-    List<Product> findHotProducts(Integer limit);
+    List<Product> findHotProducts(int limit);
     
     /**
      * 查询最新商品
      */
-    List<Product> findLatestProducts(Integer limit);
+    List<Product> findLatestProducts(int limit);
     
     /**
      * 分页查询商品
      */
-    List<Product> findByPage(Integer page, Integer size);
+    List<Product> findByPage(int page, int size);
     
     /**
      * 统计商品总数
      */
-    Integer getTotalCount();
+    int getTotalCount();
     
     /**
      * 添加商品

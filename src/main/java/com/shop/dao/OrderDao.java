@@ -41,17 +41,17 @@ public interface OrderDao {
     /**
      * 分页查询订单
      */
-    List<Order> findByPage(@Param("offset") Integer offset, @Param("size") Integer size);
+    List<Order> findByPage(@Param("offset") int offset, @Param("size") int size);
     
     /**
      * 统计订单总数
      */
-    Integer countAll();
+    int countAll();
     
     /**
      * 根据用户ID统计订单数
      */
-    Integer countByUserId(Integer userId);
+    int countByUserId(Integer userId);
     
     /**
      * 添加订单
@@ -66,7 +66,7 @@ public interface OrderDao {
     /**
      * 更新订单状态
      */
-    Integer updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+    Integer updateStatus(@Param("id") Integer id, @Param("status") int status);
     
     /**
      * 删除订单

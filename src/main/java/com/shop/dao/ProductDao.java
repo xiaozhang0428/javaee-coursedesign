@@ -28,22 +28,22 @@ public interface ProductDao {
     /**
      * 查询热销商品
      */
-    List<Product> findHotProducts(@Param("limit") Integer limit);
+    List<Product> findHotProducts(@Param("limit") int limit);
     
     /**
      * 查询最新商品
      */
-    List<Product> findLatestProducts(@Param("limit") Integer limit);
+    List<Product> findLatestProducts(@Param("limit") int limit);
     
     /**
      * 分页查询商品
      */
-    List<Product> findByPage(@Param("offset") Integer offset, @Param("limit") Integer limit);
+    List<Product> findByPage(@Param("offset") int offset, @Param("limit") int limit);
     
     /**
      * 统计商品总数
      */
-    Integer countAll();
+    int countAll();
     
     /**
      * 添加商品
@@ -63,10 +63,10 @@ public interface ProductDao {
     /**
      * 更新商品库存
      */
-    Integer updateStock(@Param("id") Integer id, @Param("quantity") Integer quantity);
+    Integer updateStock(@Param("id") Integer id, @Param("quantity") int quantity);
     
     /**
      * 更新商品销量
      */
-    Integer updateSales(@Param("id") Integer id, @Param("quantity") Integer quantity);
+    Integer updateSales(@Param("id") Integer id, @Param("quantity") int quantity);
 }
