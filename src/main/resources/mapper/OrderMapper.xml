@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.OrderDao">
+
+    <!-- 结果映射 -->
+    <resultMap id="OrderResultMap" type="Order">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="status" column="status"/>
+        <result property="shippingAddress" column="shipping_address"/>
+        <result property="createTime" column="create_time"/>
+        
+        <!-- 关联用户信息 -->
+        <association property="user" javaType="User">
+            <id property="id" column="user_id"/>
+            <result property="username" column="username"/>
+            <result property="email" column="email"/>
+            <result property="phone" column="phone"/>
+            <result property="address" column="address"/>
+        </association>
+        
+        <!-- 关联订单项 -->
+        <collection property="orderItems" ofType="OrderItem">
+            <id property="id" column="item_id"/>
+            <result property="orderId" column="order_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="productPrice" column="product_price"/>
+            <result property="quantity" column="quantity"/>
+            <result property="subtotal" column="subtotal"/>
+        </collection>
+    </resultMap>
+
+    <!-- 查询所有订单 -->
+    <select id="findAll" resultMap="OrderResultMap">
+        SELECT o.*, u.username, u.email, u.phone, u.address
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        ORDER BY o.create_time DESC
+    </select>
+
+    <!-- 根据ID查询订单 -->
+    <select id="findById" parameterType="int" resultMap="OrderResultMap">
+        SELECT o.*, u.username, u.email, u.phone, u.address,
+               oi.id as item_id, oi.product_id, oi.product_name, 
+               oi.product_price, oi.quantity, oi.subtotal
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        LEFT JOIN order_items oi ON o.id = oi.order_id
+        WHERE o.id = #{id}
+    </select>
+
+    <!-- 根据用户ID查询订单 -->
+    <select id="findByUserId" parameterType="int" resultMap="OrderResultMap">
+        SELECT o.*, u.username, u.email, u.phone, u.address
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        WHERE o.user_id = #{userId}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <!-- 根据状态查询订单 -->
+    <select id="findByStatus" parameterType="int" resultMap="OrderResultMap">
+        SELECT o.*, u.username, u.email, u.phone, u.address
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        WHERE o.status = #{status}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <!-- 分页查询订单 -->
+    <select id="findByPage" resultMap="OrderResultMap">
+        SELECT o.*, u.username, u.email, u.phone, u.address
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        ORDER BY o.create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 统计订单总数 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM orders
+    </select>
+
+    <!-- 根据用户ID统计订单数 -->
+    <select id="countByUserId" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM orders WHERE user_id = #{userId}
+    </select>
+
+    <!-- 插入订单 -->
+    <insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders (user_id, total_amount, status, shipping_address, create_time)
+        VALUES (#{userId}, #{totalAmount}, #{status}, #{shippingAddress}, #{createTime})
+    </insert>
+
+    <!-- 更新订单 -->
+    <update id="update" parameterType="Order">
+        UPDATE orders
+        <set>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="shippingAddress != null">shipping_address = #{shippingAddress},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新订单状态 -->
+    <update id="updateStatus">
+        UPDATE orders SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <!-- 删除订单 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM orders WHERE id = #{id}
+    </delete>
+
+    <!-- 根据用户ID删除订单 -->
+    <delete id="deleteByUserId" parameterType="int">
+        DELETE FROM orders WHERE user_id = #{userId}
+    </delete>
+
+</mapper>
