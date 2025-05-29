@@ -41,8 +41,8 @@ public class UserController {
      */
     @PostMapping("/doLogin")
     @ResponseBody
-    public JsonResult<User> doLogin(@RequestParam String username,
-                                   @RequestParam String password,
+    public JsonResult<User> doLogin(@RequestParam("username") String username,
+                                   @RequestParam("password") String password,
                                    HttpSession session) {
         
         if (username == null || username.trim().isEmpty()) {
@@ -68,10 +68,10 @@ public class UserController {
      */
     @PostMapping("/doRegister")
     @ResponseBody
-    public JsonResult<String> doRegister(@RequestParam String username,
-                                        @RequestParam String password,
-                                        @RequestParam String confirmPassword,
-                                        @RequestParam(required = false) String email) {
+    public JsonResult<String> doRegister(@RequestParam("username") String username,
+                                        @RequestParam("password") String password,
+                                        @RequestParam("confirmPassword") String confirmPassword,
+                                        @RequestParam(value = "email", required = false) String email) {
         
         // 参数验证
         if (username == null || username.trim().isEmpty()) {
@@ -146,9 +146,9 @@ public class UserController {
      */
     @PostMapping("/updateProfile")
     @ResponseBody
-    public JsonResult<String> updateProfile(@RequestParam(required = false) String email,
-                                           @RequestParam(required = false) String phone,
-                                           @RequestParam(required = false) String address,
+    public JsonResult<String> updateProfile(@RequestParam(value = "email", required = false) String email,
+                                           @RequestParam(value = "phone", required = false) String phone,
+                                           @RequestParam(value = "address", required = false) String address,
                                            HttpSession session) {
         
         User sessionUser = (User) session.getAttribute("user");

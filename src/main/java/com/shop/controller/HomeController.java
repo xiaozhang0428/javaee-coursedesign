@@ -39,9 +39,9 @@ public class HomeController {
      * 商品列表页
      */
     @RequestMapping("/products")
-    public String products(@RequestParam(defaultValue = "1") Integer page,
-                          @RequestParam(defaultValue = "12") Integer size,
-                          @RequestParam(required = false) String keyword,
+    public String products(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                          @RequestParam(value = "size", defaultValue = "12") Integer size,
+                          @RequestParam(value = "keyword", required = false) String keyword,
                           Model model) {
         
         List<Product> products;
@@ -73,7 +73,7 @@ public class HomeController {
      * 商品详情页
      */
     @RequestMapping("/product")
-    public String productDetail(@RequestParam Integer id, Model model) {
+    public String productDetail(@RequestParam("id") Integer id, Model model) {
         Product product = productService.findById(id);
         if (product == null) {
             return "redirect:/products";
