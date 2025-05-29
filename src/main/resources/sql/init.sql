@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS products (
 ) COMMENT '商品表';
 
 -- 创建购物车表
-CREATE TABLE IF NOT EXISTS cart (
+CREATE TABLE IF NOT EXISTS carts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL COMMENT '用户ID',
     product_id INT NOT NULL COMMENT '商品ID',
@@ -89,7 +89,7 @@ INSERT INTO products (name, description, price, stock, sales, image, status) VAL
 ('联想ThinkPad X1', '商务笔记本，14英寸2.8K显示屏', 12999.00, 20, 45, 'thinkpadx1.jpg', 1);
 
 -- 插入购物车示例数据
-INSERT INTO cart (user_id, product_id, quantity) VALUES
+INSERT INTO carts (user_id, product_id, quantity) VALUES
 (2, 1, 1),
 (2, 4, 2),
 (3, 2, 1),
