@@ -1,0 +1,61 @@
+package com.shop.service;
+
+import com.shop.entity.Product;
+
+import java.util.List;
+
+/**
+ * 商品服务接口
+ */
+public interface ProductService {
+    
+    /**
+     * 查询所有商品
+     */
+    List<Product> findAll();
+    
+    /**
+     * 根据ID查询商品
+     */
+    Product findById(Integer id);
+    
+    /**
+     * 搜索商品
+     */
+    List<Product> searchProducts(String keyword);
+    
+    /**
+     * 查询热销商品
+     */
+    List<Product> findHotProducts(Integer limit);
+    
+    /**
+     * 查询最新商品
+     */
+    List<Product> findLatestProducts(Integer limit);
+    
+    /**
+     * 分页查询商品
+     */
+    List<Product> findByPage(Integer page, Integer size);
+    
+    /**
+     * 统计商品总数
+     */
+    Integer getTotalCount();
+    
+    /**
+     * 添加商品
+     */
+    boolean addProduct(Product product);
+    
+    /**
+     * 更新商品
+     */
+    boolean updateProduct(Product product);
+    
+    /**
+     * 删除商品
+     */
+    boolean deleteProduct(Integer id);
+}

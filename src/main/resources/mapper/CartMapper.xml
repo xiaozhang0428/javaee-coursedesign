@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.CartDao">
+    
+    <resultMap id="CartResultMap" type="com.shop.entity.Cart">
+        <result property="userId" column="user_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="quantity" column="quantity"/>
+        <association property="product" javaType="com.shop.entity.Product">
+            <id property="id" column="p_id"/>
+            <result property="name" column="p_name"/>
+            <result property="description" column="p_description"/>
+            <result property="price" column="p_price"/>
+            <result property="stock" column="p_stock"/>
+            <result property="sales" column="p_sales"/>
+            <result property="status" column="p_status"/>
+        </association>
+    </resultMap>
+
+    <select id="findByUserId" parameterType="int" resultMap="CartResultMap">
+        SELECT c.user_id, c.product_id, c.quantity,
+               p.id as p_id, p.name as p_name, p.description as p_description, 
+               p.price as p_price, p.stock as p_stock, p.sales as p_sales, p.status as p_status
+        FROM carts c 
+        LEFT JOIN products p ON c.product_id = p.id
+        WHERE c.user_id = #{userId} AND p.status = 1
+    </select>
+
+    <select id="findByUserIdAndProductId" resultType="com.shop.entity.Cart">
+        SELECT * FROM carts WHERE user_id = #{userId} AND product_id = #{productId}
+    </select>
+
+    <insert id="insert" parameterType="com.shop.entity.Cart">
+        INSERT INTO carts (user_id, product_id, quantity)
+        VALUES (#{userId}, #{productId}, #{quantity})
+        ON DUPLICATE KEY UPDATE quantity = quantity + #{quantity}
+    </insert>
+
+    <update id="updateQuantity">
+        UPDATE carts SET quantity = #{quantity} 
+        WHERE user_id = #{userId} AND product_id = #{productId}
+    </update>
+
+    <delete id="deleteByUserIdAndProductId">
+        DELETE FROM carts WHERE user_id = #{userId} AND product_id = #{productId}
+    </delete>
+
+    <delete id="deleteByUserId" parameterType="int">
+        DELETE FROM carts WHERE user_id = #{userId}
+    </delete>
+
+</mapper>
