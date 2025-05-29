@@ -12,7 +12,7 @@ public interface OrderItemDao {
     /**
      * 根据订单ID查询订单明细
      */
-    List<OrderItem> findByOrderId(String orderId);
+    List<OrderItem> findByOrderId(Integer orderId);
     
     /**
      * 添加订单明细
@@ -27,5 +27,5 @@ public interface OrderItemDao {
     /**
      * 删除订单明细
      */
-    Integer deleteByOrderId(String orderId);
+    Integer deleteByOrderId(Integer orderId);
 }

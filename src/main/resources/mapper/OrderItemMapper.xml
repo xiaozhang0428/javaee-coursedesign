@@ -9,10 +9,8 @@
         <id property="id" column="id"/>
         <result property="orderId" column="order_id"/>
         <result property="productId" column="product_id"/>
-        <result property="productName" column="product_name"/>
-        <result property="productPrice" column="product_price"/>
         <result property="quantity" column="quantity"/>
-        <result property="subtotal" column="subtotal"/>
+        <result property="price" column="price"/>
         
         <!-- 关联商品信息 -->
         <association property="product" javaType="Product">
@@ -22,115 +20,42 @@
             <result property="price" column="p_price"/>
             <result property="stock" column="p_stock"/>
             <result property="sales" column="p_sales"/>
-            <result property="image" column="p_image"/>
             <result property="status" column="p_status"/>
+            <result property="categoryId" column="p_category_id"/>
             <result property="createTime" column="p_create_time"/>
         </association>
     </resultMap>
 
-    <!-- 查询所有订单项 -->
-    <select id="findAll" resultMap="OrderItemResultMap">
-        SELECT oi.*, 
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.stock as p_stock, p.sales as p_sales, p.image as p_image,
-               p.status as p_status, p.create_time as p_create_time
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        ORDER BY oi.id DESC
-    </select>
-
-    <!-- 根据ID查询订单项 -->
-    <select id="findById" parameterType="int" resultMap="OrderItemResultMap">
-        SELECT oi.*, 
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.stock as p_stock, p.sales as p_sales, p.image as p_image,
-               p.status as p_status, p.create_time as p_create_time
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        WHERE oi.id = #{id}
-    </select>
-
-    <!-- 根据订单ID查询订单项 -->
+    <!-- 根据订单ID查询订单明细 -->
     <select id="findByOrderId" parameterType="int" resultMap="OrderItemResultMap">
         SELECT oi.*, 
                p.name as p_name, p.description as p_description, p.price as p_price,
-               p.stock as p_stock, p.sales as p_sales, p.image as p_image,
-               p.status as p_status, p.create_time as p_create_time
+               p.stock as p_stock, p.sales as p_sales, p.status as p_status,
+               p.category_id as p_category_id, p.create_time as p_create_time
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = #{orderId}
         ORDER BY oi.id
     </select>
 
-    <!-- 根据商品ID查询订单项 -->
-    <select id="findByProductId" parameterType="int" resultMap="OrderItemResultMap">
-        SELECT oi.*, 
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.stock as p_stock, p.sales as p_sales, p.image as p_image,
-               p.status as p_status, p.create_time as p_create_time
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        WHERE oi.product_id = #{productId}
-        ORDER BY oi.id DESC
-    </select>
-
-    <!-- 统计订单项总数 -->
-    <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM order_items
-    </select>
-
-    <!-- 根据订单ID统计订单项数量 -->
-    <select id="countByOrderId" parameterType="int" resultType="int">
-        SELECT COUNT(*) FROM order_items WHERE order_id = #{orderId}
-    </select>
-
-    <!-- 插入订单项 -->
+    <!-- 添加订单明细 -->
     <insert id="insert" parameterType="OrderItem" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO order_items (order_id, product_id, product_name, product_price, quantity, subtotal)
-        VALUES (#{orderId}, #{productId}, #{productName}, #{productPrice}, #{quantity}, #{subtotal})
+        INSERT INTO order_items (order_id, product_id, quantity, price)
+        VALUES (#{orderId}, #{productId}, #{quantity}, #{price})
     </insert>
 
-    <!-- 批量插入订单项 -->
-    <insert id="insertBatch" parameterType="list">
-        INSERT INTO order_items (order_id, product_id, product_name, product_price, quantity, subtotal)
+    <!-- 批量添加订单明细 -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO order_items (order_id, product_id, quantity, price)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.orderId}, #{item.productId}, #{item.productName}, #{item.productPrice}, #{item.quantity}, #{item.subtotal})
+            (#{item.orderId}, #{item.productId}, #{item.quantity}, #{item.price})
         </foreach>
     </insert>
 
-    <!-- 更新订单项 -->
-    <update id="update" parameterType="OrderItem">
-        UPDATE order_items
-        <set>
-            <if test="productName != null">product_name = #{productName},</if>
-            <if test="productPrice != null">product_price = #{productPrice},</if>
-            <if test="quantity != null">quantity = #{quantity},</if>
-            <if test="subtotal != null">subtotal = #{subtotal},</if>
-        </set>
-        WHERE id = #{id}
-    </update>
-
-    <!-- 更新订单项数量 -->
-    <update id="updateQuantity">
-        UPDATE order_items 
-        SET quantity = #{quantity}, subtotal = product_price * #{quantity}
-        WHERE id = #{id}
-    </update>
-
-    <!-- 删除订单项 -->
-    <delete id="deleteById" parameterType="int">
-        DELETE FROM order_items WHERE id = #{id}
-    </delete>
-
-    <!-- 根据订单ID删除订单项 -->
+    <!-- 删除订单明细 -->
     <delete id="deleteByOrderId" parameterType="int">
         DELETE FROM order_items WHERE order_id = #{orderId}
-    </delete>
-
-    <!-- 根据商品ID删除订单项 -->
-    <delete id="deleteByProductId" parameterType="int">
-        DELETE FROM order_items WHERE product_id = #{productId}
     </delete>
 
 </mapper>
