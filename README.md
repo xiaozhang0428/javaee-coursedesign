@@ -8,10 +8,11 @@
 
 ## 技术栈
 
-- **后端框架**: Spring 5.3.21 + SpringMVC
-- **持久层**: MyBatis 3.5.10
-- **数据库**: MariaDB 10.6+
+- **后端框架**: Spring 5.3.39 + SpringMVC
+- **持久层**: MyBatis 3.5.19 + MyBatis-Spring 2.1.2
+- **数据库**: MariaDB 10.6+ (驱动版本 3.5.3)
 - **数据源**: Spring DriverManagerDataSource
+- **JSON处理**: Jackson 2.19.0
 - **前端**: Bootstrap 5.1.3 + jQuery 3.6.0
 - **构建工具**: Maven 3.6+
 - **JDK版本**: 1.8+
@@ -196,6 +197,23 @@ mvn clean package
    - 确保所有文件使用 UTF-8 编码
    - 检查数据库字符集设置
    - 确认 web.xml 中的字符编码过滤器
+
+## 版本更新历史
+
+### v1.1.0 (2025-05-29)
+- 升级 Spring Framework 从 5.3.21 到 5.3.39
+- 升级 MyBatis 从 3.5.10 到 3.5.19
+- 升级 MyBatis-Spring 从 2.0.7 到 2.1.2
+- 升级 MariaDB 驱动从 3.0.6 到 3.5.3
+- 升级 Jackson 从 2.13.3 到 2.19.0
+- 移除 Druid 连接池依赖，使用 Spring 原生 DriverManagerDataSource
+- 优化项目结构和配置
+
+### v1.0.0 (2025-05-29)
+- 完整的 JavaEE 电商系统实现
+- 基于 Spring + SpringMVC + MyBatis 三层架构
+- 用户注册登录、商品管理、购物车、订单功能
+- 响应式前端界面设计
 
 ## 许可证
 
