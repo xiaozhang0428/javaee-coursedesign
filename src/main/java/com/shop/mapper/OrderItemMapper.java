@@ -12,20 +12,20 @@ public interface OrderItemMapper {
     /**
      * 根据订单ID查询订单明细
      */
-    List<OrderItem> findByOrderId(Integer orderId);
+    List<OrderItem> findByOrderId(int orderId);
     
     /**
      * 添加订单明细
      */
-    Integer insert(OrderItem orderItem);
+    int insert(OrderItem orderItem);
     
     /**
      * 批量添加订单明细
      */
-    Integer batchInsert(List<OrderItem> orderItems);
+    int batchInsert(List<OrderItem> orderItems);
     
     /**
      * 删除订单明细
      */
-    Integer deleteByOrderId(Integer orderId);
+    int deleteByOrderId(int orderId);
 }

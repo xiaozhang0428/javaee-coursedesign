@@ -60,9 +60,6 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public boolean updateUser(User user) {
-        if (user == null || user.getId() == null) {
-            return false;
-        }
         return userMapper.update(user) > 0;
     }
     

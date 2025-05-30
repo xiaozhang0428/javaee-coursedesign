@@ -1,7 +1,8 @@
 package com.shop.service;
 
 import com.shop.entity.Order;
-import com.shop.entity.Cart;
+import com.shop.entity.User;
+import com.shop.util.Either;
 
 import java.util.List;
 
@@ -13,22 +14,22 @@ public interface OrderService {
     /**
      * 根据用户ID查询订单列表
      */
-    List<Order> findByUserId(Integer userId);
+    List<Order> findByUserId(int userId);
     
     /**
      * 根据ID查询订单详情
      */
-    Order findById(Integer id);
+    Order findById(int id);
     
     /**
      * 创建订单（从购物车结算）
      */
-    Order createOrder(Integer userId, List<Integer> productIds);
+    Either<Order> createOrder(User user, List<Integer> productIds);
     
     /**
      * 更新订单状态
      */
-    boolean updateStatus(Integer orderId, Integer status);
+    boolean updateStatus(int orderId, int status);
     
     /**
      * 分页查询订单
@@ -43,5 +44,5 @@ public interface OrderService {
     /**
      * 根据用户ID统计订单数
      */
-    int countByUserId(Integer userId);
+    int countByUserId(int userId);
 }

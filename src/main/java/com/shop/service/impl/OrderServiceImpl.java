@@ -1,18 +1,19 @@
 package com.shop.service.impl;
 
-import com.shop.entity.Order;
-import com.shop.entity.OrderItem;
-import com.shop.entity.Cart;
-import com.shop.mapper.OrderMapper;
+import com.shop.entity.*;
 import com.shop.mapper.OrderItemMapper;
-import com.shop.service.OrderService;
+import com.shop.mapper.OrderMapper;
 import com.shop.service.CartService;
+import com.shop.service.OrderService;
+import com.shop.service.ProductService;
+import com.shop.util.Either;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,29 +21,26 @@ import java.util.List;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
-    
+
     @Autowired
     private OrderMapper orderMapper;
-    
+
     @Autowired
     private OrderItemMapper orderItemMapper;
-    
+
     @Autowired
     private CartService cartService;
-    
+
+    @Autowired
+    private ProductService productService;
+
     @Override
-    public List<Order> findByUserId(Integer userId) {
-        if (userId == null) {
-            return new ArrayList<>();
-        }
+    public List<Order> findByUserId(int userId) {
         return orderMapper.findByUserId(userId);
     }
-    
+
     @Override
-    public Order findById(Integer id) {
-        if (id == null) {
-            return null;
-        }
+    public Order findById(int id) {
         Order order = orderMapper.findById(id);
         if (order != null) {
             // 加载订单明细
@@ -51,19 +49,18 @@ public class OrderServiceImpl implements OrderService {
         }
         return order;
     }
-    
+
     @Override
     @Transactional
-    public Order createOrder(Integer userId, List<Integer> productIds) {
-        if (userId == null || productIds == null || productIds.isEmpty()) {
-            return null;
+    public Either<Order> createOrder(User user, List<Integer> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Either.error("空订单");
         }
-        
+
         // 获取购物车中选中的商品
-        List<Cart> cartItems = cartService.findByUserId(userId);
+        List<Cart> cartItems = cartService.findByUserId(user.getId());
         List<Cart> selectedItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
-        
         for (Cart cart : cartItems) {
             if (productIds.contains(cart.getProductId())) {
                 selectedItems.add(cart);
@@ -71,66 +68,65 @@ public class OrderServiceImpl implements OrderService {
                 totalAmount = totalAmount.add(itemTotal);
             }
         }
-        
         if (selectedItems.isEmpty()) {
-            return null;
+            return Either.error("空订单");
         }
-        
+
         // 创建订单
-        Order order = new Order(userId, totalAmount);
-        Integer result = orderMapper.insert(order);
-        
-        if (result > 0 && order.getId() != null) {
-            // 创建订单明细
-            List<OrderItem> orderItems = new ArrayList<>();
-            for (Cart cart : selectedItems) {
-                OrderItem orderItem = new OrderItem(
-                    order.getId(),
-                    cart.getProductId(),
-                    cart.getQuantity(),
-                    cart.getProduct().getPrice()
-                );
-                orderItems.add(orderItem);
-            }
-            
-            // 批量插入订单明细
-            orderItemMapper.batchInsert(orderItems);
-            
-            // 从购物车中删除已结算的商品
-            for (Integer productId : productIds) {
-                cartService.removeFromCart(userId, productId);
-            }
-            
-            return order;
+        Order order = new Order(user.getId(), totalAmount, 0, user.getAddress(), new Date());
+        if (orderMapper.insert(order) <= 0) {
+            return Either.error("订单创建失败");
         }
-        
-        return null;
+
+        // 删除库存 建立订单明细
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (Cart item : selectedItems) {
+            Product product = productService.findById(item.getProductId());
+            if (product == null) {
+                return Either.error("商品 %s 不存在", item.getProduct().getName());
+            }
+            if (product.getStock() >= item.getQuantity()) {
+                product.setStock(product.getStock() - item.getQuantity());
+                product.setSales(product.getSales() + item.getQuantity());
+                if (!productService.updateProduct(product)) {
+                    // 更新失败
+                    return Either.error("商品 %s 更新失败", product.getName());
+                }
+            } else {
+                // 库存不足
+                return Either.error( "商品 %s 库存不足", product.getName());
+            }
+
+            // 订单明细
+            orderItems.add(new OrderItem(0, order.getId(), item.getProductId(), item.getQuantity(), item.getProduct().getPrice(), product));
+        }
+
+        if (orderItemMapper.batchInsert(orderItems) <= orderItems.size()) {
+            // 未全部插入
+            return Either.error("订单明细更新失败");
+        }
+
+        return Either.of(order);
     }
-    
+
     @Override
-    public boolean updateStatus(Integer orderId, Integer status) {
-        if (orderId == null || status == null) {
-            return false;
-        }
+    public boolean updateStatus(int orderId, int status) {
         return orderMapper.updateStatus(orderId, status) > 0;
     }
-    
+
     @Override
     public List<Order> findByPage(int page, int size) {
         int offset = (page - 1) * size;
         return orderMapper.findByPage(offset, size);
     }
-    
+
     @Override
     public int countAll() {
         return orderMapper.countAll();
     }
-    
+
     @Override
-    public int countByUserId(Integer userId) {
-        if (userId == null) {
-            return 0;
-        }
+    public int countByUserId(int userId) {
         return orderMapper.countByUserId(userId);
     }
 }

@@ -1,9 +1,9 @@
 package com.shop.service.impl;
 
-import com.shop.mapper.CartMapper;
-import com.shop.mapper.ProductMapper;
 import com.shop.entity.Cart;
 import com.shop.entity.Product;
+import com.shop.mapper.CartMapper;
+import com.shop.mapper.ProductMapper;
 import com.shop.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,91 +24,73 @@ public class CartServiceImpl implements CartService {
     private ProductMapper productMapper;
     
     @Override
-    public List<Cart> findByUserId(Integer userId) {
-        if (userId == null) {
-            return null;
-        }
+    public List<Cart> findByUserId(int userId) {
         return cartMapper.findByUserId(userId);
     }
     
     @Override
-    public boolean addToCart(Integer userId, Integer productId, int quantity) {
-        if (userId == null || productId == null || quantity <= 0) {
-            return false;
+    public String addToCart(int userId, int productId, int quantity) {
+        if (quantity <= 0) {
+            return "参数错误";
         }
         
-        // 检查商品是否存在且有库存
         Product product = productMapper.findById(productId);
         if (product == null || product.getStatus() != 1 || product.getStock() < quantity) {
-            return false;
+            return "库存不足";
         }
         
-        // 检查购物车中是否已有该商品
         Cart existingCart = cartMapper.findByUserIdAndProductId(userId, productId);
         if (existingCart != null) {
             // 更新数量
             int newQuantity = existingCart.getQuantity() + quantity;
             if (newQuantity > product.getStock()) {
-                return false;
+                return "库存不足";
             }
-            return cartMapper.updateQuantity(userId, productId, newQuantity) > 0;
+            if (cartMapper.updateQuantity(userId, productId, newQuantity) > 0) {
+                return null;
+            }
         } else {
             // 新增购物车项
-            Cart cart = new Cart(userId, productId, quantity);
-            return cartMapper.insert(cart) > 0;
+            Cart cart = new Cart(userId, productId, quantity, null);
+            if (cartMapper.insert(cart) > 0) {
+                return null;
+            }
         }
+
+        return "添加失败";
     }
     
     @Override
-    public boolean updateQuantity(Integer userId, Integer productId, int quantity) {
-        if (userId == null || productId == null || quantity <= 0) {
-            return false;
+    public String updateQuantity(int userId, int productId, int quantity) {
+        if (quantity <= 0) {
+            return "参数错误";
         }
         
         // 检查库存
         Product product = productMapper.findById(productId);
         if (product == null || product.getStock() < quantity) {
-            return false;
+            return "库存不足";
         }
         
-        return cartMapper.updateQuantity(userId, productId, quantity) > 0;
+        return cartMapper.updateQuantity(userId, productId, quantity) > 0 ? null : "更新失败";
     }
     
     @Override
-    public boolean removeFromCart(Integer userId, Integer productId) {
-        if (userId == null || productId == null) {
-            return false;
-        }
+    public boolean removeFromCart(int userId, int productId) {
         return cartMapper.deleteByUserIdAndProductId(userId, productId) > 0;
     }
     
     @Override
-    public boolean clearCart(Integer userId) {
-        if (userId == null) {
-            return false;
-        }
+    public boolean clearCart(int userId) {
         return cartMapper.deleteByUserId(userId) > 0;
     }
     
     @Override
-    public double getTotalAmount(Integer userId) {
-        if (userId == null) {
-            return 0.0;
-        }
-        
-        List<Cart> cartItems = findByUserId(userId);
-        if (cartItems == null || cartItems.isEmpty()) {
-            return 0.0;
-        }
-        
-        BigDecimal total = BigDecimal.ZERO;
-        for (Cart cart : cartItems) {
-            if (cart.getProduct() != null && cart.getProduct().getPrice() != null) {
-                BigDecimal subtotal = cart.getProduct().getPrice().multiply(new BigDecimal(cart.getQuantity()));
-                total = total.add(subtotal);
-            }
-        }
-        
-        return total.doubleValue();
+    public double getTotalAmount(int userId) {
+        return findByUserId(userId).stream()
+                .filter(cart -> cart.getProduct() != null && cart.getProduct().getPrice() != null)
+                .map(cart -> cart.getProduct().getPrice().multiply(new BigDecimal(cart.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .doubleValue();
     }
 }

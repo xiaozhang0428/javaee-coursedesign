@@ -13,30 +13,30 @@ public interface CartMapper {
     /**
      * 根据用户ID查询购物车
      */
-    List<Cart> findByUserId(Integer userId);
+    List<Cart> findByUserId(int userId);
     
     /**
      * 根据用户ID和商品ID查询购物车项
      */
-    Cart findByUserIdAndProductId(@Param("userId") Integer userId, @Param("productId") Integer productId);
+    Cart findByUserIdAndProductId(@Param("userId") int userId, @Param("productId") int productId);
     
     /**
      * 添加到购物车
      */
-    Integer insert(Cart cart);
+    int insert(Cart cart);
     
     /**
      * 更新购物车商品数量
      */
-    Integer updateQuantity(@Param("userId") Integer userId, @Param("productId") Integer productId, @Param("quantity") int quantity);
+    int updateQuantity(@Param("userId") int userId, @Param("productId") int productId, @Param("quantity") int quantity);
     
     /**
      * 删除购物车项
      */
-    Integer deleteByUserIdAndProductId(@Param("userId") Integer userId, @Param("productId") Integer productId);
+    int deleteByUserIdAndProductId(@Param("userId") int userId, @Param("productId") int productId);
     
     /**
      * 清空用户购物车
      */
-    Integer deleteByUserId(Integer userId);
+    int deleteByUserId(int userId);
 }

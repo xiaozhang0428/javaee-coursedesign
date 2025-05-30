@@ -1,7 +1,5 @@
-/* 全局样式 */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
+a {
+    text-decoration: none !important;
 }
 
 /* 商品卡片样式 */
@@ -117,43 +115,6 @@ body {
     border-radius: 5px;
     font-weight: 500;
     transition: all 0.3s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-/* 导航栏样式 */
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
-.navbar-nav .nav-link {
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-/* 页脚样式 */
-footer {
-    margin-top: auto;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .card-img-top-wrapper {
-        height: 150px;
-    }
-    
-    .message-container {
-        left: 20px;
-        right: 20px;
-        max-width: none;
-    }
-    
-    .quantity-input {
-        width: 60px;
-    }
 }
 
 /* 加载动画 */

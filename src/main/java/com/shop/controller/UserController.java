@@ -1,15 +1,19 @@
 package com.shop.controller;
 
-import com.shop.entity.User;
+import com.shop.entity.*;
+import com.shop.service.OrderService;
 import com.shop.service.UserService;
 import com.shop.util.JsonResult;
 import com.shop.util.MD5Util;
+import com.shop.util.UserLoginRequest;
+import com.shop.util.UserRegisterRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * 用户控制器
@@ -17,104 +21,83 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-    
+
     @Autowired
     private UserService userService;
-    
+
+    @Autowired
+    private OrderService orderService;
+
     /**
-     * 登录页面
+     * 登录
      */
-    @RequestMapping("/login")
-    public String loginPage() {
+    @GetMapping("/login")
+    public String login() {
         return "login";
     }
-    
+
     /**
-     * 注册页面
+     * 注册
      */
-    @RequestMapping("/register")
-    public String registerPage() {
+    @GetMapping("/register")
+    public String register() {
         return "register";
     }
-    
+
     /**
      * 用户登录
      */
-    @PostMapping("/doLogin")
     @ResponseBody
-    public JsonResult<User> doLogin(@RequestParam("username") String username,
-                                   @RequestParam("password") String password,
-                                   HttpSession session) {
-        
-        if (username == null || username.trim().isEmpty()) {
-            return JsonResult.error("用户名不能为空");
-        }
-        
-        if (password == null || password.trim().isEmpty()) {
-            return JsonResult.error("密码不能为空");
-        }
-        
-        User user = userService.login(username.trim(), password);
-        if (user != null) {
+    @PostMapping("/login")
+    public JsonResult<String> login(@RequestBody UserLoginRequest user, HttpSession session) {
+        User loginedUser = userService.login(user.getUsername().trim(), user.getPassword());
+        if (loginedUser != null) {
             // 登录成功，保存用户信息到session
-            session.setAttribute("user", user);
-            return JsonResult.success("登录成功", user);
+            session.setAttribute("user", loginedUser);
+            return JsonResult.success("登录成功", user.getRedirect());
         } else {
             return JsonResult.error("用户名或密码错误");
         }
     }
-    
+
     /**
      * 用户注册
      */
-    @PostMapping("/doRegister")
     @ResponseBody
-    public JsonResult<String> doRegister(@RequestParam("username") String username,
-                                        @RequestParam("password") String password,
-                                        @RequestParam("confirmPassword") String confirmPassword,
-                                        @RequestParam(value = "email", required = false) String email) {
-        
-        // 参数验证
-        if (username == null || username.trim().isEmpty()) {
-            return JsonResult.error("用户名不能为空");
+    @PostMapping("/register")
+    public JsonResult<String> register(@RequestBody UserRegisterRequest user,
+                                       HttpSession session) {
+        String username = user.getUsername();
+        if (username == null || username.length() < 3 || username.length() > 20) {
+            return JsonResult.error("用户名长度为3-20个字符");
         }
-        
-        if (password == null || password.trim().isEmpty()) {
-            return JsonResult.error("密码不能为空");
-        }
-        
-        if (!password.equals(confirmPassword)) {
-            return JsonResult.error("两次密码输入不一致");
-        }
-        
-        if (username.length() < 3 || username.length() > 20) {
-            return JsonResult.error("用户名长度必须在3-20个字符之间");
-        }
-        
-        if (password.length() < 6) {
-            return JsonResult.error("密码长度不能少于6位");
-        }
-        
-        // 检查用户名是否已存在
+        username = username.trim();
         if (userService.isUsernameExists(username.trim())) {
             return JsonResult.error("用户名已存在");
         }
-        
-        // 检查邮箱是否已存在
-        if (email != null && !email.trim().isEmpty() && userService.isEmailExists(email.trim())) {
-            return JsonResult.error("邮箱已被注册");
+
+        String password = user.getPassword();
+        if (password == null || password.length() < 6) {
+            return JsonResult.error("密码长度不少于6位");
         }
-        
-        // 创建用户
-        User user = new User(username.trim(), password, email != null ? email.trim() : null);
-        
-        if (userService.register(user)) {
-            return JsonResult.success("注册成功");
+
+        String email = user.getEmail();
+        if (email != null && !email.trim().isEmpty() && userService.isEmailExists(email.trim())) {
+            return JsonResult.error("邮箱已存在");
+        }
+        if (email != null && !email.contains("@")) {
+            return JsonResult.error("邮箱格式不正确");
+        }
+
+        User registeredUser = new User(0, username, password, email != null ? email.trim() : null, null, null, null);
+        if (userService.register(registeredUser)) {
+            session.setAttribute("user", registeredUser);
+            return JsonResult.success("注册成功", user.getRedirect());
         } else {
             return JsonResult.error("注册失败，请稍后重试");
         }
     }
-    
+
     /**
      * 用户退出
      */
@@ -124,55 +107,52 @@ public class UserController {
         session.invalidate();
         return "redirect:/";
     }
-    
+
     /**
      * 个人中心
      */
-    @RequestMapping("/profile")
+    @GetMapping("/profile")
     public String profile(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/user/login";
         }
-        
+
         // 获取最新的用户信息
         User currentUser = userService.findById(user.getId());
         model.addAttribute("user", currentUser);
-        
+
         return "profile";
     }
-    
+
     /**
      * 更新个人信息
      */
-    @PostMapping("/updateProfile")
     @ResponseBody
-    public JsonResult<String> updateProfile(@RequestParam(value = "email", required = false) String email,
-                                           @RequestParam(value = "phone", required = false) String phone,
-                                           @RequestParam(value = "address", required = false) String address,
-                                           HttpSession session) {
-        
-        User sessionUser = (User) session.getAttribute("user");
-        if (sessionUser == null) {
+    @PostMapping("/profile")
+    public JsonResult<String> profile(@RequestParam(value = "email", required = false) String email,
+                                      @RequestParam(value = "phone", required = false) String phone,
+                                      @RequestParam(value = "address", required = false) String address,
+                                      HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
             return JsonResult.error("请先登录");
         }
-        
-        User user = new User();
-        user.setId(sessionUser.getId());
+
+        user.setId(user.getId());
         user.setEmail(email != null ? email.trim() : null);
         user.setPhone(phone != null ? phone.trim() : null);
         user.setAddress(address != null ? address.trim() : null);
-        
         if (userService.updateUser(user)) {
             // 更新session中的用户信息
-            User updatedUser = userService.findById(sessionUser.getId());
-            session.setAttribute("user", updatedUser);
+            User newUser = userService.findById(user.getId());
+            session.setAttribute("user", newUser);
             return JsonResult.success("更新成功");
         } else {
             return JsonResult.error("更新失败");
         }
     }
-    
+
     /**
      * 我的订单页面
      */
@@ -182,52 +162,51 @@ public class UserController {
         if (user == null) {
             return "redirect:/user/login";
         }
-        
-        // 这里可以添加订单查询逻辑
-        // List<Order> orders = orderService.findByUserId(user.getId());
-        // model.addAttribute("orders", orders);
-        
+
+        List<Order> orders = orderService.findByUserId(user.getId());
+        model.addAttribute("orders", orders);
+
         return "orders";
     }
-    
+
     /**
      * 修改密码
      */
     @PostMapping("/changePassword")
     @ResponseBody
     public JsonResult<String> changePassword(@RequestParam("oldPassword") String oldPassword,
-                                            @RequestParam("newPassword") String newPassword,
-                                            @RequestParam("confirmPassword") String confirmPassword,
-                                            HttpSession session) {
-        
+                                             @RequestParam("newPassword") String newPassword,
+                                             @RequestParam("confirmPassword") String confirmPassword,
+                                             HttpSession session) {
+
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser == null) {
             return JsonResult.error("请先登录");
         }
-        
+
         if (oldPassword == null || oldPassword.trim().isEmpty()) {
             return JsonResult.error("原密码不能为空");
         }
-        
+
         if (newPassword == null || newPassword.trim().isEmpty()) {
             return JsonResult.error("新密码不能为空");
         }
-        
+
         if (!newPassword.equals(confirmPassword)) {
             return JsonResult.error("两次密码输入不一致");
         }
-        
+
         if (newPassword.length() < 6) {
             return JsonResult.error("新密码长度不能少于6位");
         }
-        
+
         // 验证原密码 - 需要加密后比较
         User user = userService.findById(sessionUser.getId());
         String encryptedOldPassword = MD5Util.encrypt(oldPassword);
         if (!user.getPassword().equals(encryptedOldPassword)) {
             return JsonResult.error("原密码错误");
         }
-        
+
         // 更新密码 - 需要加密新密码
         String encryptedNewPassword = MD5Util.encrypt(newPassword);
         user.setPassword(encryptedNewPassword);

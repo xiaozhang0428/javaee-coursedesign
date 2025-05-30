@@ -12,30 +12,30 @@ public interface CartService {
     /**
      * 查询用户购物车
      */
-    List<Cart> findByUserId(Integer userId);
+    List<Cart> findByUserId(int userId);
     
     /**
      * 添加商品到购物车
      */
-    boolean addToCart(Integer userId, Integer productId, int quantity);
+    String addToCart(int userId, int productId, int quantity);
     
     /**
      * 更新购物车商品数量
      */
-    boolean updateQuantity(Integer userId, Integer productId, int quantity);
+    String updateQuantity(int userId, int productId, int quantity);
     
     /**
      * 从购物车删除商品
      */
-    boolean removeFromCart(Integer userId, Integer productId);
+    boolean removeFromCart(int userId, int productId);
     
     /**
      * 清空购物车
      */
-    boolean clearCart(Integer userId);
+    boolean clearCart(int userId);
     
     /**
      * 计算购物车总金额
      */
-    double getTotalAmount(Integer userId);
+    double getTotalAmount(int userId);
 }

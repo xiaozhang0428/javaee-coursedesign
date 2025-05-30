@@ -1,7 +1,7 @@
 package com.shop.service.impl;
 
-import com.shop.mapper.ProductMapper;
 import com.shop.entity.Product;
+import com.shop.mapper.ProductMapper;
 import com.shop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,18 +95,12 @@ public class ProductServiceImpl implements ProductService {
             return false;
         }
         product.setCreateTime(new Date());
-        if (product.getStatus() == null) {
-            product.setStatus(1);
-        }
-        if (product.getSales() == null) {
-            product.setSales(0);
-        }
         return productMapper.insert(product) > 0;
     }
     
     @Override
     public boolean updateProduct(Product product) {
-        if (product == null || product.getId() == null) {
+        if (product == null) {
             return false;
         }
         return productMapper.update(product) > 0;
