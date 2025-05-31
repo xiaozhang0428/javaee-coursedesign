@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateTotal();
                 updateCartCount();
             })
-            .catch(e => showMessage(e.message, 'error'))
+            .catch(e => showMessage(e.message, 'danger'))
             .finally(() => {
                 buttons.forEach(btn => btn.disabled = false);
                 input.disabled = false;
@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 删除单个商品
     document.querySelectorAll('.delete-item').forEach(btn => btn.addEventListener('click', () => {
         const cartId = parseInt(btn.dataset.cartId);
-        console.log(cartId)
         if (confirm('删？')) {
             removeCartItem(cartId)
                 .then(() => {
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateCartCount();
                     location.reload();
                 })
-                .catch(error => showMessage(error.message, 'error'));
+                .catch(error => showMessage(error.message, 'danger'));
         }
     }));
 
@@ -109,23 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateCartCount();
                     showMessage('商品已删除', {type: 'success', reload: true});
                 })
-                .catch(e => showMessage(e.message, 'error'))
+                .catch(e => showMessage(e.message, 'danger'))
         }
     });
 
     // 结算
     document.querySelector('#checkoutBtn').addEventListener('click', event => {
         const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-        if (selectedItems.length === 0) {
-            showMessage('请先选择要结算的商品', 'warning');
-            return;
-        }
         // 确认结算
         if (confirm('确认结算？')) {
             showLoading(event.target);
             checkoutCart(Array.from(selectedItems).map(el => el.value))
                 .then(message => showMessage(message, {type: 'success', reload: true}))
-                .catch(error => showMessage(error.message, 'error'))
+                .catch(error => showMessage(error.message, 'danger'))
                 .finally(() => hideLoading(event.target));
         }
     })

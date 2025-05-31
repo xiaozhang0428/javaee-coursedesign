@@ -13,6 +13,7 @@
 <body class="bg-light">
 <!-- 导航栏 -->
 <jsp:include page="common/header.jsp"/>
+<jsp:include page="common/toast.jsp"/>
 
 <div class="container">
   <div class="row justify-content-center mt-5">
@@ -76,32 +77,17 @@
               </button>
             </div>
           </form>
-
-          <div class="text-center mt-3">
-            <p class="mb-0">已有账号？
-              <a href="${pageContext.request.contextPath}/user/login" class="text-decoration-none">
-                立即登录
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/static/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/all.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/api.js"></script>
+<jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    const button = document.querySelector('#register');
-    button.addEventListener('click', event => {
+    document.querySelector('#register').addEventListener('click', event => {
         event.preventDefault()
-        event.stopPropagation()
-
-        // 校验表单
         const form = document.querySelector('#registerForm');
         if (!form.checkValidity()) {
             form.classList.add('was-validated')
@@ -109,22 +95,16 @@
 
         const password = document.querySelector('#password').value;
         const confirmPassword = document.querySelector('#confirmPassword').value;
-        if (password !== confirmPassword) {
-            showMessage("两次密码不一致", 'error');
-            return;
-        }
-
-        // 注册
         const username = document.querySelector('#username').value.trim();
         const email = document.querySelector('#email').value;
-        showLoading(button);
-        register(username, password, email)
+        showLoading(event.target);
+        register(username, password, confirmPassword, email)
             .then(redirect => showMessage('注册成功', {
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
-            .catch(error => showMessage(error.message, 'error'))
-            .finally(() => hideLoading(button));
+            .catch(error => showMessage(error.message, 'danger'))
+            .finally(() => hideLoading(event.target));
     });
 </script>
 </body>

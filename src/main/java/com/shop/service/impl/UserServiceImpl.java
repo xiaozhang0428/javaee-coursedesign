@@ -3,7 +3,7 @@ package com.shop.service.impl;
 import com.shop.mapper.UserMapper;
 import com.shop.entity.User;
 import com.shop.service.UserService;
-import com.shop.util.MD5Util;
+import com.shop.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
         if (username == null || password == null) {
             return null;
         }
-        String encryptedPassword = MD5Util.encrypt(password);
+        String encryptedPassword = StringUtils.md5(password);
         return userMapper.findByUsernameAndPassword(username, encryptedPassword);
     }
     
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         }
         
         // 密码加密
-        user.setPassword(MD5Util.encrypt(user.getPassword()));
+        user.setPassword(StringUtils.md5(user.getPassword()));
         user.setCreateTime(new Date());
         
         return userMapper.insert(user) > 0;

@@ -94,11 +94,11 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 // 库存不足
-                return Either.error( "商品 %s 库存不足", product.getName());
+                return Either.error("商品 %s 库存不足", product.getName());
             }
 
             // 订单明细
-            orderItems.add(new OrderItem(0, order.getId(), item.getProductId(), item.getQuantity(), item.getProduct().getPrice(), product));
+            orderItems.add(OrderItem.forCreate(order.getId(), item.getProductId(), item.getQuantity(), item.getProduct().getPrice(), product));
         }
 
         if (orderItemMapper.batchInsert(orderItems) <= orderItems.size()) {

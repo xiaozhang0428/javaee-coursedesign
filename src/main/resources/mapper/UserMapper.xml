@@ -35,7 +35,8 @@
         UPDATE users SET 
             email = #{email},
             phone = #{phone},
-            address = #{address}
+            address = #{address},
+            password = #{password}
         WHERE id = #{id}
     </update>
 

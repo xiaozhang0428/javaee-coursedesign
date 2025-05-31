@@ -11,7 +11,7 @@
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<!-- 导航栏 -->
+<jsp:include page="common/toast.jsp"/>
 <jsp:include page="common/header.jsp"/>
 
 <div class="container">
@@ -53,46 +53,31 @@
               </button>
             </div>
           </form>
-
-          <div class="text-center mt-3">
-            <p class="mb-0">还没有账号？
-              <a href="${pageContext.request.contextPath}/user/register" class="text-decoration-none">
-                立即注册
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/static/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/all.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/api.js"></script>
+<jsp:include page="common/dependency_js.jsp"/>
 
 <script>
     document.querySelector('#login').addEventListener('click', event => {
         event.preventDefault()
-        event.stopPropagation()
-
-        // 校验表单
         const form = document.querySelector('#loginForm');
         if (!form.checkValidity()) {
             form.classList.add('was-validated')
+            return
         }
 
-        // 登录
         const username = document.querySelector('#username').value.trim();
         const password = document.querySelector('#password').value;
-        console.log(username, password)
         login(username, password)
             .then(redirect => showMessage('登录成功', {
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
-            .catch(error => showMessage(error.message, 'error'))
+            .catch(error => showMessage(error.message, 'danger'))
     });
 </script>
 </body>

@@ -22,7 +22,7 @@
             <button class="btn btn-primary btn-sm"
                     onclick="addToCart(${param.id})
                         .then(msg => updateCartCount && updateCartCount(msg))
-                        .catch(e => showMessage(e.message, 'error'))">
+                        .catch(e => showMessage(e.message, 'danger'))">
               <i class="fas fa-shopping-cart"></i> 添加到购物车
             </button>
           </c:when>

@@ -15,6 +15,7 @@
 <body>
 <!-- 导航栏 -->
 <jsp:include page="common/header.jsp"/>
+<jsp:include page="common/toast.jsp"/>
 
 <div class="container mt-4">
   <!-- 搜索 筛选 -->
@@ -97,10 +98,7 @@
   </c:if>
 </div>
 
-<script src="${pageContext.request.contextPath}/static/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/all.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/api.js"></script>
+<jsp:include page="common/dependency_js.jsp"/>
 
 <script>
     const searchButton = document.querySelector('#searchBtn');

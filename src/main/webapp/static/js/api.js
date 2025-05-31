@@ -80,13 +80,60 @@ async function login(username, password, redirect = '/') {
  *
  * @param username {string}
  * @param password {string}
+ * @param confirmPassword {string}
  * @param email {string}
  * @param redirect {string}
  * @returns {Promise<string>}
  */
-async function register(username, password, email, redirect = '/') {
+async function register(username, password, confirmPassword, email, redirect = '/') {
+    if (password.length < 6) {
+        throw new Error('密码长度不能少于6位');
+    }
+    if (password !== confirmPassword) {
+        throw new Error("两次密码不一致");
+    }
+     if (!email.includes('@')) {
+        throw new Error('请输入正确的邮箱格式')
+    }
+
     const result = await post(`/user/register`, {username, password, email, redirect});
     return result.data;
+}
+
+/**
+ * 修改用户信息
+ *
+ * @param email {string | undefined}
+ * @param phone {string | undefined}
+ * @param address {string | undefined}
+ * @returns {Promise<void>}
+ */
+async function updateProfile(email, phone, address) {
+    if (email && !email.includes('@')) {
+        throw new Error('请输入正确的邮箱格式')
+    }
+
+    if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+        throw new Error('请输入正确的手机格式')
+    }
+
+    await post('/user/profile', {email, phone, address});
+}
+
+async function updatePassword(oldPassword, newPassword, confirmPassword) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+        throw new Error('请填写完整信息');
+    }
+
+    if (newPassword !== confirmPassword) {
+        throw new Error('两次密码输入不一致');
+    }
+
+    if (newPassword.length < 6) {
+        throw new Error('密码长度不能少于6位');
+    }
+
+    await post('/user/password', {oldPassword, newPassword, confirmPassword});
 }
 
 // cart
@@ -136,16 +183,30 @@ async function removeCartItem(productId) {
 }
 
 /**
- * 批量删除 购物车物品
+ * 批量删除购物车物品
  * @param productIds
  * @returns {Promise<int[]>}
  */
 async function removeCartItems(productIds) {
+    if (!productIds || productIds.length === 0) {
+        throw new Error('请选择要删除的商品');
+    }
+
     const result = await post('/cart/remove', productIds)
     return result.data;
 }
 
+/**
+ * 结算
+ *
+ * @param productIds 选中的商品 id
+ * @returns {Promise<string>}
+ */
 async function checkoutCart(productIds) {
+    if (!productIds || productIds.length === 0) {
+        throw new Error('请选择要结算的商品');
+    }
+
     const result = await post('/cart/checkout', productIds);
     return result.message;
 }

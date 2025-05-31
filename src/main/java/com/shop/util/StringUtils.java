@@ -3,41 +3,37 @@ package com.shop.util;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * MD5加密工具类
- */
-public class MD5Util {
-    
-    /**
-     * MD5加密
-     */
-    public static String encrypt(String input) {
+public class StringUtils {
+
+    public static boolean isEmpty(String str) {
+        return !org.springframework.util.StringUtils.hasText(str);
+    }
+
+    public static boolean isPhone(String phone) {
+        return phone != null && phone.trim().matches("^1[3-9]\\d{9}$");
+    }
+
+    public static boolean isEmail(String email) {
+        return email != null && email.trim().matches("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$");
+    }
+
+    public static String md5(String input) {
         if (input == null) {
             return null;
         }
-        
+
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] digest = md.digest(input.getBytes());
-            
+
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
                 sb.append(String.format("%02x", b & 0xff));
             }
-            
+
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("MD5加密失败", e);
         }
-    }
-    
-    /**
-     * 验证密码
-     */
-    public static boolean verify(String input, String encrypted) {
-        if (input == null || encrypted == null) {
-            return false;
-        }
-        return encrypted.equals(encrypt(input));
     }
 }

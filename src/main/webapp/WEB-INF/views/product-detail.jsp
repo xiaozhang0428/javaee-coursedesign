@@ -14,6 +14,7 @@
 </head>
 <body>
 <jsp:include page="common/header.jsp"/>
+<jsp:include page="common/toast.jsp"/>
 
 <!-- 商品详情 -->
 <div class="container mt-4">
@@ -58,8 +59,7 @@
             <div class="col-4">
               <div class="input-group">
                 <button class="btn btn-outline-secondary" type="button" onclick="decreaseQuantity()">-</button>
-                <input type="number" class="form-control text-center" id="quantity" value="1" min="1"
-                       max="${product.stock}">
+                <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="${product.stock}">
                 <button class="btn btn-outline-secondary" type="button" onclick="increaseQuantity()">+</button>
               </div>
             </div>
@@ -111,33 +111,30 @@
   </c:if>
 </div>
 
-<script src="${pageContext.request.contextPath}/static/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/all.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/api.js"></script>
+<jsp:include page="common/dependency_js.jsp"/>
 
 <script>
     // +
     function increaseQuantity() {
         const quantityInput = document.querySelector("#quantity");
-        quantityInput.value = Math.min(quantityInput.value + 1, parseInt(quantityInput.max));
+        quantityInput.value = Math.min(parseInt(quantityInput.value) + 1, parseInt(quantityInput.max));
     }
 
     // -
     function decreaseQuantity() {
         const quantityInput = document.querySelector("#quantity");
-        quantityInput.value = Math.max(quantityInput.value - 1, 1);
+        quantityInput.value = Math.max(parseInt(quantityInput.value) - 1, 1);
     }
 
     function addOrBuy(redirect) {
         <c:choose>
         <c:when test="${sessionScope.user != null}">
-        addToCart(document.querySelector('#quantity').value)
+        addToCart(${product.id}, document.querySelector('#quantity').value)
             .then(message => showMessage(message, {type: 'success', redirect}))
             .catch(error => console.error(error.message));
         </c:when>
         <c:otherwise>
-        showMessage('请先登录', {type: 'info', redirect: '${pageContext.request.contextPath}/user/login'});
+        showMessage('请先登录', {type: 'warning', redirect: '${pageContext.request.contextPath}/user/login'});
         </c:otherwise>
         </c:choose>
     }

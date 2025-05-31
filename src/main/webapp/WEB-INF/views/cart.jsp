@@ -15,10 +15,14 @@
 <body>
 <!-- 导航栏 -->
 <jsp:include page="common/header.jsp"/>
+<jsp:include page="common/toast.jsp"/>
+<jsp:include page="common/profile_nav.jsp">
+  <jsp:param name="selected_item" value="2"/>
+</jsp:include>
 
 <div class="container mt-4">
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-10">
       <div class="card">
         <div class="card-header">
           <div class="row align-items-center">
@@ -97,7 +101,7 @@
       </div>
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-2 position-fixed top-10" style="right: 8%">
       <div class="card">
         <div class="card-header">
           <h5 class="mb-0"><i class="fas fa-calculator"></i> 结算信息</h5>
@@ -131,12 +135,7 @@
   </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/static/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/all.min.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/static/js/api.js"></script>
-
+<jsp:include page="common/dependency_js.jsp"/>
 <script src="${pageContext.request.contextPath}/static/js/cart.js"></script>
-
 </body>
 </html>
