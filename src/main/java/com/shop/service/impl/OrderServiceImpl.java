@@ -101,9 +101,14 @@ public class OrderServiceImpl implements OrderService {
             orderItems.add(OrderItem.forCreate(order.getId(), item.getProductId(), item.getQuantity(), item.getProduct().getPrice(), product));
         }
 
-        if (orderItemMapper.batchInsert(orderItems) <= orderItems.size()) {
+        if (orderItemMapper.batchInsert(orderItems) < orderItems.size()) {
             // 未全部插入
             return Either.error("订单明细更新失败");
+        }
+
+        // 从购物车中删除已结算的商品
+        for (Cart item : selectedItems) {
+            cartService.removeFromCart(user.getId(), item.getProductId());
         }
 
         return Either.of(order);
