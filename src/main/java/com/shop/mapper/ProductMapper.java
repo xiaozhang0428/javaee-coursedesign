@@ -79,4 +79,14 @@ public interface ProductMapper {
      * 更新商品销量
      */
     int updateSales(@Param("id") int id, @Param("quantity") int quantity);
+
+    /**
+     * 获取搜索建议（自动补全）
+     */
+    List<String> getSearchSuggestions(@Param("keyword") String keyword, @Param("limit") int limit);
+
+    /**
+     * 获取热门搜索关键词
+     */
+    List<String> getHotSearchKeywords(@Param("limit") int limit);
 }

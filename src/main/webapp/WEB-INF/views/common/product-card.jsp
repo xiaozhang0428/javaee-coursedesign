@@ -45,8 +45,8 @@
         </small>
       </div>
       <a href="${pageContext.request.contextPath}/product?id=${param.id}" class="h-100">
-        <h5 class="card-title">${param.name}</h5>
-        <p class="card-text text-muted small">
+        <h5 class="card-title product-name">${param.name}</h5>
+        <p class="card-text text-muted small product-description">
           <c:choose>
             <c:when test="${fn:length(param.description) > 50}">
               ${fn:substring(param.description, 0, 50)}...

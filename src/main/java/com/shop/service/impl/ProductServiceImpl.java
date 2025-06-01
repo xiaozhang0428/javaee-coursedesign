@@ -113,4 +113,23 @@ public class ProductServiceImpl implements ProductService {
         }
         return productMapper.deleteById(id) > 0;
     }
+    
+    @Override
+    public List<String> getSearchSuggestions(String keyword, int limit) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getHotSearchKeywords(limit);
+        }
+        if (limit <= 0) {
+            limit = 10;
+        }
+        return productMapper.getSearchSuggestions(keyword.trim(), limit);
+    }
+    
+    @Override
+    public List<String> getHotSearchKeywords(int limit) {
+        if (limit <= 0) {
+            limit = 10;
+        }
+        return productMapper.getHotSearchKeywords(limit);
+    }
 }

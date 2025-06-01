@@ -71,5 +71,6 @@
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
+<script src="${pageContext.request.contextPath}/static/js/search.js"></script>
 </body>
 </html>
