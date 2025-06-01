@@ -21,6 +21,9 @@ public class Order {
     private User user;
     private List<OrderItem> orderItems;
 
+    public Order() {
+    }
+
     public Order(int userId, BigDecimal totalAmount, int status, String shippingAddress, Date createTime) {
         this.userId = userId;
         this.totalAmount = totalAmount;

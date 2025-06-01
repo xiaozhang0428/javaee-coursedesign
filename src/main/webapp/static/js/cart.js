@@ -115,14 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 结算
     document.querySelector('#checkoutBtn').addEventListener('click', event => {
         const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-        // 确认结算
-        if (confirm('确认结算？')) {
-            showLoading(event.target);
-            checkoutCart(Array.from(selectedItems).map(el => el.value))
-                .then(message => showMessage(message, {type: 'success', reload: true}))
-                .catch(error => showMessage(error.message, 'danger'))
-                .finally(() => hideLoading(event.target));
+        if (selectedItems.length === 0) {
+            showToast('请选择要结算的商品', 'error');
+            return;
         }
+        
+        // 跳转到结算页面
+        const productIds = Array.from(selectedItems).map(el => el.value);
+        const params = new URLSearchParams();
+        productIds.forEach(id => params.append('productIds', id));
+        
+        window.location.href = '/javaee-coursedesign/order/checkout?' + params.toString();
     })
 
 })

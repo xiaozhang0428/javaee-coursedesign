@@ -100,57 +100,114 @@
         <div class="card-body">
           <!-- 订单列表 -->
           <div id="orderList">
-            <!-- 暂无订单 -->
-            <div class="empty-orders">
-              <i class="fas fa-shopping-bag"></i>
-              <h4>暂无订单</h4>
-              <p class="mb-3">您还没有任何订单，快去购买商品吧！</p>
-              <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">
-                <i class="fas fa-shopping-cart me-2"></i>去购物
-              </a>
-            </div>
-
-            <!-- 示例订单（实际应该从后端获取） -->
-            <!--
-                            <div class="order-card">
-                                <div class="order-header">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-3">
-                                            <strong>订单号：</strong>202312010001
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>下单时间：</strong>2023-12-01 10:30
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>订单金额：</strong>￥299.00
-                                        </div>
-                                        <div class="col-md-3 text-end">
-                                            <span class="order-status status-paid">已付款</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-2">
-                                            <img src="${pageContext.request.contextPath}/static/images/products/default.jpg" 
-                                                 class="img-fluid rounded" alt="商品图片">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>商品名称</h6>
-                                            <p class="text-muted mb-1">商品描述信息</p>
-                                            <small class="text-muted">数量：1</small>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <strong>￥299.00</strong>
-                                        </div>
-                                        <div class="col-md-2 text-end">
-                                            <button class="btn btn-sm btn-outline-primary mb-1">查看详情</button><br>
-                                            <button class="btn btn-sm btn-outline-secondary">申请退款</button>
-                                        </div>
-                                    </div>
-                                </div>
+            <c:choose>
+              <c:when test="${empty orders}">
+                <!-- 暂无订单 -->
+                <div class="empty-orders">
+                  <i class="fas fa-shopping-bag"></i>
+                  <h4>暂无订单</h4>
+                  <p class="mb-3">您还没有任何订单，快去购买商品吧！</p>
+                  <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart me-2"></i>去购物
+                  </a>
+                </div>
+              </c:when>
+              <c:otherwise>
+                <!-- 订单列表 -->
+                <c:forEach var="order" items="${orders}">
+                  <div class="order-card" data-status="${order.status}">
+                    <div class="order-header">
+                      <div class="row align-items-center">
+                        <div class="col-md-3">
+                          <strong>订单号：</strong>${order.id}
+                        </div>
+                        <div class="col-md-3">
+                          <strong>下单时间：</strong>
+                          <fmt:formatDate value="${order.createTime}" pattern="yyyy-MM-dd HH:mm"/>
+                        </div>
+                        <div class="col-md-3">
+                          <strong>订单金额：</strong>
+                          <fmt:formatNumber value="${order.totalAmount}" pattern="¥#,##0.00"/>
+                        </div>
+                        <div class="col-md-3 text-end">
+                          <c:choose>
+                            <c:when test="${order.status == 0}">
+                              <span class="order-status status-pending">待支付</span>
+                            </c:when>
+                            <c:when test="${order.status == 1}">
+                              <span class="order-status status-paid">已支付</span>
+                            </c:when>
+                            <c:when test="${order.status == 2}">
+                              <span class="order-status status-shipped">已发货</span>
+                            </c:when>
+                            <c:when test="${order.status == 3}">
+                              <span class="order-status status-delivered">已完成</span>
+                            </c:when>
+                            <c:when test="${order.status == -1}">
+                              <span class="order-status status-cancelled">已取消</span>
+                            </c:when>
+                          </c:choose>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <c:forEach var="item" items="${order.orderItems}" varStatus="status">
+                        <c:if test="${status.index < 3}">
+                          <div class="row align-items-center mb-3">
+                            <div class="col-md-2">
+                              <img src="${pageContext.request.contextPath}/static/images/products/${item.product.image}" 
+                                   class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;"
+                                   alt="${item.product.name}">
                             </div>
-                            -->
+                            <div class="col-md-6">
+                              <h6 class="mb-1">${item.product.name}</h6>
+                              <p class="text-muted mb-1">
+                                <c:choose>
+                                  <c:when test="${fn:length(item.product.description) > 50}">
+                                    ${fn:substring(item.product.description, 0, 50)}...
+                                  </c:when>
+                                  <c:otherwise>
+                                    ${item.product.description}
+                                  </c:otherwise>
+                                </c:choose>
+                              </p>
+                              <small class="text-muted">数量：${item.quantity}</small>
+                            </div>
+                            <div class="col-md-2">
+                              <strong>
+                                <fmt:formatNumber value="${item.price * item.quantity}" pattern="¥#,##0.00"/>
+                              </strong>
+                            </div>
+                            <div class="col-md-2 text-end">
+                              <c:if test="${status.index == 0}">
+                                <a href="${pageContext.request.contextPath}/order/detail/${order.id}" 
+                                   class="btn btn-sm btn-outline-primary mb-1">查看详情</a><br>
+                                <c:choose>
+                                  <c:when test="${order.status == 0}">
+                                    <button class="btn btn-sm btn-primary" onclick="payOrder(${order.id})">立即支付</button>
+                                  </c:when>
+                                  <c:when test="${order.status == 2}">
+                                    <button class="btn btn-sm btn-success" onclick="confirmReceive(${order.id})">确认收货</button>
+                                  </c:when>
+                                  <c:when test="${order.status == 3}">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="buyAgain(${order.id})">再次购买</button>
+                                  </c:when>
+                                </c:choose>
+                              </c:if>
+                            </div>
+                          </div>
+                        </c:if>
+                      </c:forEach>
+                      <c:if test="${fn:length(order.orderItems) > 3}">
+                        <div class="text-center">
+                          <small class="text-muted">还有 ${fn:length(order.orderItems) - 3} 件商品...</small>
+                        </div>
+                      </c:if>
+                    </div>
+                  </div>
+                </c:forEach>
+              </c:otherwise>
+            </c:choose>
           </div>
         </div>
       </div>
@@ -161,15 +218,91 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    // 订单状态筛选
-    $('input[name="orderStatus"]').on('change', function () {
-        var status = $(this).val();
-        filterOrders(status);
+    $(document).ready(function() {
+        // 订单状态筛选
+        $('input[name="orderStatus"]').on('change', function () {
+            var status = $(this).val();
+            filterOrders(status);
+        });
     });
 
     function filterOrders(status) {
-        // 这里应该发送AJAX请求获取对应状态的订单
-        console.log('筛选订单状态：', status);
+        if (status === '') {
+            // 显示所有订单
+            $('.order-card').show();
+        } else {
+            // 根据状态筛选订单
+            $('.order-card').hide();
+            let statusValue;
+            switch(status) {
+                case 'pending': statusValue = 0; break;
+                case 'paid': statusValue = 1; break;
+                case 'shipped': statusValue = 2; break;
+                case 'delivered': statusValue = 3; break;
+                default: statusValue = -1;
+            }
+            $('.order-card[data-status="' + statusValue + '"]').show();
+        }
+    }
+
+    function payOrder(orderId) {
+        if (confirm('确认支付此订单吗？')) {
+            $.ajax({
+                url: '${pageContext.request.contextPath}/order/updateStatus',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    status: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showToast('支付成功！', 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showToast('支付失败：' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('网络错误，请重试', 'error');
+                }
+            });
+        }
+    }
+
+    function confirmReceive(orderId) {
+        if (confirm('确认已收到商品吗？')) {
+            $.ajax({
+                url: '${pageContext.request.contextPath}/order/updateStatus',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    status: 3
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showToast('确认收货成功！', 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showToast('操作失败：' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('网络错误，请重试', 'error');
+                }
+            });
+        }
+    }
+
+    function buyAgain(orderId) {
+        showToast('正在添加到购物车...', 'info');
+        // 这里可以实现再次购买的逻辑
+        setTimeout(function() {
+            showToast('功能开发中...', 'info');
+        }, 1000);
     }
 </script>
 </body>
