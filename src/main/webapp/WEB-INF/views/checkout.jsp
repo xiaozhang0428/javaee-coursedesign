@@ -257,11 +257,13 @@
 
     $(document).ready(function() {
         // 获取商品ID列表
-        const productIds = [<c:forEach var="id" items="${productIds}" varStatus="status">${id}<c:if test="${!status.last}">,</c:if></c:forEach>];
+        const urlParams = new URLSearchParams(window.location.search);
+        const productIdsParam = urlParams.get('productIds');
+        const productIds = productIdsParam ? productIdsParam.split(',').map(id => parseInt(id)) : [];
         console.log('Product IDs:', productIds);
         
         if (productIds.length === 0) {
-            showToast('没有选择商品', 'error');
+            showMessage('没有选择商品', {type: 'error'});
             return;
         }
         
@@ -290,24 +292,32 @@
 
     function loadProducts(productIds) {
         console.log('Loading products for IDs:', productIds);
+        
+        // 构建表单数据
+        var formData = new FormData();
+        productIds.forEach(function(id) {
+            formData.append('productIds', id);
+        });
+        
         $.ajax({
             url: '${pageContext.request.contextPath}/cart/getSelectedItems',
             type: 'POST',
-            data: { 'productIds': productIds },
-            traditional: true,
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function(response) {
                 console.log('AJAX Response:', response);
                 if (response.success) {
                     displayProducts(response.data);
                     calculateTotal();
                 } else {
-                    showToast('加载商品信息失败：' + response.message, 'error');
+                    showMessage('加载商品信息失败：' + response.message, {type: 'error'});
                 }
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', error);
                 console.error('Response:', xhr.responseText);
-                showToast('网络错误，请重试', 'error');
+                showMessage('网络错误，请重试', {type: 'error'});
             }
         });
     }
@@ -362,7 +372,7 @@
         const newAddress = $('#newAddress').val().trim();
         
         if (!receiverName || !receiverPhone || !newAddress) {
-            showToast('请填写完整的地址信息', 'error');
+            showMessage('请填写完整的地址信息', {type: 'error'});
             return;
         }
         
@@ -386,17 +396,17 @@
         $('.section-content').prepend(newAddressHtml);
         $('#newAddressForm').collapse('hide');
         
-        showToast('地址已更新', 'success');
+        showMessage('地址已更新', {type: 'success'});
     }
 
     function submitOrder() {
         if (!selectedAddress) {
-            showToast('请选择收货地址', 'error');
+            showMessage('请选择收货地址', {type: 'error'});
             return;
         }
         
         if (selectedProducts.length === 0) {
-            showToast('没有选择商品', 'error');
+            showMessage('没有选择商品', {type: 'error'});
             return;
         }
         
@@ -413,7 +423,7 @@
             },
             success: function(response) {
                 if (response.success) {
-                    showToast('订单创建成功！', 'success');
+                    showMessage('订单创建成功！', {type: 'success'});
                     // 跳转到订单详情页面
                     setTimeout(function() {
                         window.location.href = '${pageContext.request.contextPath}/order/detail/' + response.data.id;
@@ -424,7 +434,7 @@
                 }
             },
             error: function() {
-                showToast('网络错误，请重试', 'error');
+                showMessage('网络错误，请重试', {type: 'error'});
                 $('#submitOrderBtn').prop('disabled', false).html('<i class="fas fa-lock me-2"></i>提交订单');
             }
         });
