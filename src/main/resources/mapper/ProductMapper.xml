@@ -120,4 +120,20 @@
         UPDATE products SET sales = sales + #{quantity} WHERE id = #{id}
     </update>
 
+    <!-- 获取搜索建议（自动补全） -->
+    <select id="getSearchSuggestions" resultType="string">
+        SELECT DISTINCT name FROM products 
+        WHERE status = 1 AND name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY sales DESC, create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取热门搜索关键词 -->
+    <select id="getHotSearchKeywords" resultType="string">
+        SELECT DISTINCT name FROM products 
+        WHERE status = 1 AND sales > 0
+        ORDER BY sales DESC
+        LIMIT #{limit}
+    </select>
+
 </mapper>

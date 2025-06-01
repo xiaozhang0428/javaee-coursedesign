@@ -11,6 +11,34 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
+  <style>
+    .search-highlight {
+      background-color: #fff3cd;
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+    
+    .search-suggestions {
+      font-family: inherit;
+    }
+    
+    .hot-search-tags {
+      margin-top: 10px;
+    }
+    
+    .hot-search-tags .badge {
+      margin-right: 8px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .hot-search-tags .badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
 <!-- 导航栏 -->
@@ -23,10 +51,16 @@
     <div class="col-md-10">
       <div class="input-group">
         <input type="text" class="form-control" id="searchKeyword"
-               placeholder="搜索商品..." value="${param.keyword}">
+               placeholder="搜索商品名称、描述..." value="${param.keyword}"
+               autocomplete="off">
         <button class="btn btn-primary" type="button" id="searchBtn">
           <i class="fas fa-search"></i> 搜索
         </button>
+      </div>
+      <!-- 热门搜索标签 -->
+      <div class="hot-search-tags" id="hotSearchTags" style="display: none;">
+        <small class="text-muted">热门搜索：</small>
+        <div id="hotSearchContainer"></div>
       </div>
     </div>
     <div class="col-md-2">
@@ -99,11 +133,23 @@
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
+<script src="${pageContext.request.contextPath}/static/js/search.js"></script>
 
 <script>
     const searchButton = document.querySelector('#searchBtn');
     const sortSelect = document.querySelector('#sortSelect');
     const searchKeyword = document.querySelector('#searchKeyword');
+    const hotSearchTags = document.querySelector('#hotSearchTags');
+    const hotSearchContainer = document.querySelector('#hotSearchContainer');
+
+    // 初始化搜索增强功能
+    const searchEnhancer = new SearchEnhancer({
+        searchInput: searchKeyword,
+        searchButton: searchButton,
+        contextPath: '${pageContext.request.contextPath}',
+        debounceDelay: 300,
+        maxSuggestions: 8
+    });
 
     function search() {
         const keyword = searchKeyword.value.trim();
@@ -122,17 +168,55 @@
         window.location.href = url;
     }
 
-    // ?sort=xxx
+    // 设置当前排序
     let currentSort = '${param.sort}';
     if (currentSort) {
         sortSelect.value = currentSort;
     }
 
-    sortSelect.addEventListener('change', search)
+    // 绑定事件
+    sortSelect.addEventListener('change', search);
     searchButton.addEventListener('click', search);
     searchKeyword.addEventListener('keypress', e => {
         if (e.key === 'Enter') {
             search();
+        }
+    });
+
+    // 加载热门搜索标签
+    async function loadHotSearchTags() {
+        try {
+            const response = await fetch('${pageContext.request.contextPath}/api/search/hot-keywords?limit=6');
+            const data = await response.json();
+            
+            if (data.success && data.keywords && data.keywords.length > 0) {
+                hotSearchContainer.innerHTML = '';
+                data.keywords.forEach(keyword => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-light text-dark';
+                    badge.textContent = keyword;
+                    badge.style.cursor = 'pointer';
+                    badge.addEventListener('click', () => {
+                        searchKeyword.value = keyword;
+                        search();
+                    });
+                    hotSearchContainer.appendChild(badge);
+                });
+                hotSearchTags.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('加载热门搜索失败:', error);
+        }
+    }
+
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', () => {
+        loadHotSearchTags();
+        
+        // 如果有搜索关键词，高亮显示搜索结果
+        const currentKeyword = '${param.keyword}';
+        if (currentKeyword) {
+            SearchEnhancer.highlightSearchResults(currentKeyword);
         }
     });
 </script>

@@ -20,9 +20,9 @@
 
       <!-- 搜索框 -->
       <form class="d-flex me-3" action="${pageContext.request.contextPath}/products" method="get">
-        <div class="input-group">
+        <div class="input-group" style="position: relative;">
           <input id="search-input" class="form-control" type="search" name="keyword" placeholder="搜索商品..." value="${param.keyword}" autocomplete="off">
-          <button class="btn btn-light" type="submit">
+          <button class="btn btn-light" type="submit" id="header-search-btn">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -72,7 +72,23 @@
 <script>
     // 购物车
     window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
-    document.addEventListener('DOMContentLoaded', () => updateCartCount());
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartCount();
+        
+        // 初始化头部搜索框的自动补全功能
+        const headerSearchInput = document.querySelector('#search-input');
+        const headerSearchBtn = document.querySelector('#header-search-btn');
+        
+        if (headerSearchInput && typeof SearchEnhancer !== 'undefined') {
+            new SearchEnhancer({
+                searchInput: headerSearchInput,
+                searchButton: headerSearchBtn,
+                contextPath: '${pageContext.request.contextPath}',
+                debounceDelay: 300,
+                maxSuggestions: 6
+            });
+        }
+    });
 
     function updateCartCount(message = undefined) {
         <c:if test="${not empty sessionScope.user}">
