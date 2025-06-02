@@ -89,4 +89,9 @@ public interface ProductMapper {
      * 获取热门搜索关键词
      */
     List<String> getHotSearchKeywords(@Param("limit") int limit);
+
+    /**
+     * 统计搜索结果数量
+     */
+    int countSearchResults(@Param("keyword") String keyword);
 }

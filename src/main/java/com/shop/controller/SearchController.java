@@ -36,8 +36,17 @@ public class SearchController {
         
         try {
             List<String> suggestions = productService.getSearchSuggestions(keyword, limit);
+            int totalCount = 0;
+            
+            // 如果有关键词，获取搜索结果总数
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                totalCount = productService.countSearchResults(keyword);
+            }
+            
             result.put("success", true);
             result.put("suggestions", suggestions);
+            result.put("totalCount", totalCount);
+            result.put("keyword", keyword);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             result.put("success", false);
