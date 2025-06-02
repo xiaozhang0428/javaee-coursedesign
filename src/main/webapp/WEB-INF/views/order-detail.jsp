@@ -170,9 +170,10 @@
                         <div class="product-item">
                             <div class="row align-items-center">
                                 <div class="col-auto">
-                                    <img src="${pageContext.request.contextPath}/static/images/products/${item.product.image}" 
+                                    <img src="${pageContext.request.contextPath}/static/images/products/${empty item.product.image ? 'default.jpg' : item.product.image}" 
                                          class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;"
-                                         alt="${item.product.name}">
+                                         alt="${item.product.name}"
+                                         onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
                                 </div>
                                 <div class="col">
                                     <h6 class="mb-1">${item.product.name}</h6>
