@@ -75,17 +75,17 @@ INSERT INTO users (username, password, email, phone, address) VALUES
 
 -- 插入商品数据
 INSERT INTO products (name, description, price, stock, sales, image, status) VALUES
-('iPhone 14 Pro', '苹果最新旗舰手机，搭载A16仿生芯片，支持5G网络', 7999.00, 50, 120, 'iphone14pro.jpg', 1),
-('MacBook Pro 14', '苹果笔记本电脑，M2芯片，14英寸Liquid Retina XDR显示屏', 15999.00, 30, 85, 'macbookpro14.jpg', 1),
+('iPhone 16 Pro', '苹果最新旗舰手机，搭载A18 Pro仿生芯片，支持5G网络', 7999.00, 50, 120, 'iphone16pro.jpg', 1),
+('MacBook Pro', '苹果笔记本电脑，M3芯片，14英寸Liquid Retina XDR显示屏', 15999.00, 30, 85, 'macbookpro.jpg', 1),
 ('iPad Air', '轻薄便携的平板电脑，10.9英寸屏幕，支持Apple Pencil', 4399.00, 80, 200, 'ipadair.jpg', 1),
-('AirPods Pro', '主动降噪无线耳机，空间音频技术', 1899.00, 100, 350, 'airpodspro.jpg', 1),
-('Apple Watch Series 8', '智能手表，健康监测，GPS定位', 2999.00, 60, 180, 'applewatch8.jpg', 1),
-('华为Mate 50 Pro', '华为旗舰手机，麒麟9000S芯片，超感知徕卡摄影', 6999.00, 40, 95, 'huaweimate50pro.jpg', 1),
-('小米13 Ultra', '小米影像旗舰，徕卡光学镜头，骁龙8 Gen 2', 5999.00, 70, 150, 'xiaomi13ultra.jpg', 1),
+('AirPods Pro 2', '主动降噪无线耳机，空间音频技术', 1899.00, 100, 350, 'airpodspro2.jpg', 1),
+('Apple Watch Series 10', '智能手表，健康监测，GPS定位', 2999.00, 60, 180, 'applewatch10.jpg', 1),
+('华为Mate 70 Pro', '华为旗舰手机，麒麟9010芯片，超感知徕卡摄影', 6999.00, 40, 95, 'huaweimate70pro.jpg', 1),
+('小米15S Pro', '小米影像旗舰，徕卡光学镜头，骁龙8 Gen 3', 5999.00, 70, 150, 'xiaomi15spro.png', 1),
 ('戴尔XPS 13', '轻薄笔记本，13.4英寸InfinityEdge显示屏', 8999.00, 25, 60, 'dellxps13.jpg', 1),
-('索尼WH-1000XM4', '无线降噪耳机，30小时续航', 2299.00, 90, 280, 'sonywh1000xm4.jpg', 1),
+('索尼WH-1000XM6', '无线降噪耳机，30小时续航', 2299.00, 90, 280, 'sonywh1000xm6.jpg', 1),
 ('任天堂Switch', '便携式游戏机，支持掌机和主机模式', 2099.00, 120, 400, 'nintendoswitch.jpg', 1),
-('三星Galaxy S23', '三星旗舰手机，骁龙8 Gen 2处理器', 5499.00, 55, 110, 'samsungs23.jpg', 1),
+('三星Galaxy S25', '三星旗舰手机，骁龙8 Gen 3处理器', 5499.00, 55, 110, 'samsungs25.jpg', 1),
 ('联想ThinkPad X1', '商务笔记本，14英寸2.8K显示屏', 12999.00, 20, 45, 'thinkpadx1.jpg', 1);
 
 -- 插入购物车示例数据

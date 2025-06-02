@@ -12,6 +12,7 @@ CREATE TABLE products
     price       DECIMAL(10, 2) NOT NULL, -- 商品价格
     stock       INT     DEFAULT 0,       -- 库存数量
     sales       INT     DEFAULT 0,       -- 销量
+    image       VARCHAR(500),            -- 商品图片
     status      TINYINT DEFAULT 1,       -- 商品状态（1-正常，0-下架）
     category_id INT,                     -- 分类ID
     create_time DATETIME                 -- 上架时间

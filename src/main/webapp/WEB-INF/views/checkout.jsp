@@ -332,7 +332,8 @@
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <img src="${pageContext.request.contextPath}/static/images/products/\${item.product.image || 'default.jpg'}" 
-                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;"
+                                 onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
                         </div>
                         <div class="col">
                             <h6 class="mb-1">\${item.product.name}</h6>
