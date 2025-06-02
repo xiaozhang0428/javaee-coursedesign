@@ -57,9 +57,12 @@ class SearchEnhancer {
         // 输入事件 - 防抖处理
         this.searchInput.addEventListener('input', (e) => {
             clearTimeout(this.debounceTimer);
+            const value = e.target.value;
+            // 对于单字符搜索，减少防抖延迟以提高响应速度
+            const delay = value.trim().length === 1 ? Math.max(this.debounceDelay / 2, 150) : this.debounceDelay;
             this.debounceTimer = setTimeout(() => {
-                this.handleInput(e.target.value);
-            }, this.debounceDelay);
+                this.handleInput(value);
+            }, delay);
         });
         
         // 键盘导航
@@ -98,12 +101,12 @@ class SearchEnhancer {
             return;
         }
         
-        if (keyword.length < 2) {
+        // 移除2字符限制，支持单字符搜索
+        if (keyword.length >= 1) {
+            this.fetchSuggestions(keyword);
+        } else {
             this.hideSuggestions();
-            return;
         }
-        
-        this.fetchSuggestions(keyword);
     }
     
     handleKeydown(e) {
@@ -153,11 +156,14 @@ class SearchEnhancer {
     
     async fetchSuggestions(keyword) {
         try {
-            const response = await fetch(`${this.contextPath}/api/search/suggestions?keyword=${encodeURIComponent(keyword)}&limit=${this.maxSuggestions}`);
+            // 对于单字符搜索，增加更多建议数量
+            const limit = keyword.length === 1 ? Math.min(this.maxSuggestions * 2, 15) : this.maxSuggestions;
+            
+            const response = await fetch(`${this.contextPath}/api/search/suggestions?keyword=${encodeURIComponent(keyword)}&limit=${limit}`);
             const data = await response.json();
             
             if (data.success && data.suggestions) {
-                this.showSuggestions(data.suggestions, keyword);
+                this.showSuggestions(data.suggestions, keyword, data.totalCount);
             } else {
                 this.hideSuggestions();
             }
@@ -180,7 +186,7 @@ class SearchEnhancer {
         }
     }
     
-    showSuggestions(suggestions, keyword = '') {
+    showSuggestions(suggestions, keyword = '', totalCount = 0) {
         if (!suggestions || suggestions.length === 0) {
             this.hideSuggestions();
             return;
@@ -188,6 +194,38 @@ class SearchEnhancer {
         
         this.selectedIndex = -1;
         this.suggestionContainer.innerHTML = '';
+        
+        // 添加搜索统计信息
+        if (keyword && totalCount > 0) {
+            const tip = document.createElement('div');
+            tip.className = 'suggestion-tip';
+            
+            let tipText = '';
+            if (keyword.length === 1) {
+                tipText = `找到 ${totalCount} 个包含"${keyword}"的商品`;
+            } else {
+                tipText = `约 ${totalCount} 个搜索结果`;
+            }
+            
+            tip.textContent = tipText;
+            tip.style.cssText = `
+                padding: 6px 12px;
+                font-size: 12px;
+                color: #666;
+                background-color: #f8f9fa;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                align-items: center;
+            `;
+            
+            // 添加搜索图标
+            tip.innerHTML = `
+                <i class="fas fa-search" style="margin-right: 6px; color: #007bff;"></i>
+                <span>${tipText}</span>
+            `;
+            
+            this.suggestionContainer.appendChild(tip);
+        }
         
         suggestions.forEach((suggestion, index) => {
             const item = document.createElement('div');

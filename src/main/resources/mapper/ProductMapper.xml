@@ -27,28 +27,51 @@
 
     <select id="searchByKeyword" parameterType="string" resultMap="ProductResultMap">
         SELECT * FROM products 
-        WHERE status = 1 AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
-        ORDER BY sales DESC, create_time DESC
+        WHERE status = 1 AND (
+            name LIKE CONCAT(#{keyword}, '%') OR 
+            name LIKE CONCAT('%', #{keyword}, '%') OR
+            description LIKE CONCAT('%', #{keyword}, '%')
+        )
+        ORDER BY 
+            CASE 
+                WHEN name LIKE CONCAT(#{keyword}, '%') THEN 1
+                WHEN name LIKE CONCAT('% ', #{keyword}, '%') THEN 2
+                WHEN name LIKE CONCAT('%', #{keyword}, '%') THEN 3
+                ELSE 4
+            END,
+            sales DESC, 
+            create_time DESC
     </select>
 
     <select id="searchByKeywordWithSort" resultMap="ProductResultMap">
         SELECT * FROM products 
-        WHERE status = 1 AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        WHERE status = 1 AND (
+            name LIKE CONCAT(#{keyword}, '%') OR 
+            name LIKE CONCAT('%', #{keyword}, '%') OR
+            description LIKE CONCAT('%', #{keyword}, '%')
+        )
+        ORDER BY 
+            CASE 
+                WHEN name LIKE CONCAT(#{keyword}, '%') THEN 1
+                WHEN name LIKE CONCAT('% ', #{keyword}, '%') THEN 2
+                WHEN name LIKE CONCAT('%', #{keyword}, '%') THEN 3
+                ELSE 4
+            END,
         <choose>
             <when test="sort == 'price_asc'">
-                ORDER BY price ASC
+                price ASC
             </when>
             <when test="sort == 'price_desc'">
-                ORDER BY price DESC
+                price DESC
             </when>
             <when test="sort == 'sales_desc'">
-                ORDER BY sales DESC
+                sales DESC
             </when>
             <when test="sort == 'create_time_desc'">
-                ORDER BY create_time DESC
+                create_time DESC
             </when>
             <otherwise>
-                ORDER BY sales DESC, create_time DESC
+                sales DESC, create_time DESC
             </otherwise>
         </choose>
     </select>
@@ -123,8 +146,20 @@
     <!-- 获取搜索建议（自动补全） -->
     <select id="getSearchSuggestions" resultType="string">
         SELECT DISTINCT name FROM products 
-        WHERE status = 1 AND name LIKE CONCAT('%', #{keyword}, '%')
-        ORDER BY sales DESC, create_time DESC
+        WHERE status = 1 AND (
+            name LIKE CONCAT(#{keyword}, '%') OR 
+            name LIKE CONCAT('%', #{keyword}, '%') OR
+            description LIKE CONCAT('%', #{keyword}, '%')
+        )
+        ORDER BY 
+            CASE 
+                WHEN name LIKE CONCAT(#{keyword}, '%') THEN 1
+                WHEN name LIKE CONCAT('% ', #{keyword}, '%') THEN 2
+                WHEN name LIKE CONCAT('%', #{keyword}, '%') THEN 3
+                ELSE 4
+            END,
+            sales DESC, 
+            create_time DESC
         LIMIT #{limit}
     </select>
 
@@ -134,6 +169,16 @@
         WHERE status = 1 AND sales > 0
         ORDER BY sales DESC
         LIMIT #{limit}
+    </select>
+
+    <!-- 统计搜索结果数量 -->
+    <select id="countSearchResults" resultType="int">
+        SELECT COUNT(*) FROM products 
+        WHERE status = 1 AND (
+            name LIKE CONCAT(#{keyword}, '%') OR 
+            name LIKE CONCAT('%', #{keyword}, '%') OR
+            description LIKE CONCAT('%', #{keyword}, '%')
+        )
     </select>
 
 </mapper>

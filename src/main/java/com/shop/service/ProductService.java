@@ -78,4 +78,9 @@ public interface ProductService {
      * 获取热门搜索关键词
      */
     List<String> getHotSearchKeywords(int limit);
+    
+    /**
+     * 统计搜索结果数量
+     */
+    int countSearchResults(String keyword);
 }

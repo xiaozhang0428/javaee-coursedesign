@@ -132,4 +132,12 @@ public class ProductServiceImpl implements ProductService {
         }
         return productMapper.getHotSearchKeywords(limit);
     }
+    
+    @Override
+    public int countSearchResults(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getTotalCount();
+        }
+        return productMapper.countSearchResults(keyword.trim());
+    }
 }
