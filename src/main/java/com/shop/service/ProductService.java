@@ -68,4 +68,19 @@ public interface ProductService {
      * 删除商品
      */
     boolean deleteProduct(Integer id);
+    
+    /**
+     * 获取搜索建议（自动补全）
+     */
+    List<String> getSearchSuggestions(String keyword, int limit);
+    
+    /**
+     * 获取热门搜索关键词
+     */
+    List<String> getHotSearchKeywords(int limit);
+    
+    /**
+     * 统计搜索结果数量
+     */
+    int countSearchResults(String keyword);
 }

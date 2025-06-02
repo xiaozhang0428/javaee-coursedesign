@@ -30,8 +30,9 @@
   <div class="row">
     <!-- 商品图片 -->
     <div class="col-md-6 product-image-container">
-      <img src="${pageContext.request.contextPath}/static/images/products/${product.image}"
-           class="img-fluid rounded" alt="${product.name}">
+      <img src="${pageContext.request.contextPath}/static/images/products/${empty product.image ? 'default.jpg' : product.image}"
+           class="img-fluid rounded" alt="${product.name}"
+           onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
     </div>
 
     <!-- 商品信息 -->

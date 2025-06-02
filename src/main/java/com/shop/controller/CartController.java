@@ -163,6 +163,30 @@ public class CartController {
     }
 
     /**
+     * 获取选中的购物车商品
+     */
+    @PostMapping("/getSelectedItems")
+    @ResponseBody
+    public JsonResult<List<Cart>> getSelectedItems(@RequestParam("productIds") List<Integer> productIds,
+                                                   HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+
+        if (productIds.isEmpty()) {
+            return JsonResult.error("请选择商品");
+        }
+
+        List<Cart> cartItems = cartService.findByUserId(user.getId());
+        List<Cart> selectedItems = cartItems.stream()
+                .filter(item -> productIds.contains(item.getProductId()))
+                .toList();
+
+        return JsonResult.success(selectedItems);
+    }
+
+    /**
      * 结算购物车商品
      */
     @PostMapping("/checkout")

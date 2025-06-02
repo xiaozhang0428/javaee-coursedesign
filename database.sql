@@ -1,8 +1,3 @@
-create user if not exists javaee identified by 'javaee';
-
-drop database if exists javaee_shop;
-create database javaee_shop;
-grant all privileges on javaee_shop.* to javaee;
 use javaee_shop;
 
 -- 关闭外键检查
@@ -17,6 +12,7 @@ CREATE TABLE products
     price       DECIMAL(10, 2) NOT NULL, -- 商品价格
     stock       INT     DEFAULT 0,       -- 库存数量
     sales       INT     DEFAULT 0,       -- 销量
+    image       VARCHAR(500),            -- 商品图片
     status      TINYINT DEFAULT 1,       -- 商品状态（1-正常，0-下架）
     category_id INT,                     -- 分类ID
     create_time DATETIME                 -- 上架时间
@@ -37,21 +33,22 @@ CREATE TABLE users
 -- 订单表
 CREATE TABLE orders
 (
-    id           INT PRIMARY KEY AUTO_INCREMENT, -- 订单号
-    user_id      INT NOT NULL,
-    total_amount DECIMAL(10, 2),                 -- 订单总金额
-    status       TINYINT DEFAULT 0,              -- 订单状态（0-待支付，1-已支付，2-已发货，3-已完成）
-    create_time  DATETIME                        -- 下单时间
+    id               INT PRIMARY KEY AUTO_INCREMENT, -- 订单号
+    user_id          INT NOT NULL,
+    total_amount     DECIMAL(10, 2),                 -- 订单总金额
+    status           TINYINT DEFAULT 0,              -- 订单状态（0-待支付，1-已支付，2-已发货，3-已完成）
+    shipping_address VARCHAR(200),                   -- 收货地址
+    create_time      DATETIME                        -- 下单时间
 );
 
 -- 订单明细表
 CREATE TABLE order_items
 (
     id         INT PRIMARY KEY AUTO_INCREMENT,
-    order_id   VARCHAR(50)    NOT NULL,
+    order_id   INT            NOT NULL,            -- 修改为INT类型
     product_id INT            NOT NULL,
-    quantity   INT            NOT NULL, -- 购买数量
-    price      DECIMAL(10, 2) NOT NULL  -- 商品单价
+    quantity   INT            NOT NULL,            -- 购买数量
+    price      DECIMAL(10, 2) NOT NULL             -- 商品单价
 );
 
 -- 购物车表
