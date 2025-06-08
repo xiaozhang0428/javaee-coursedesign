@@ -7,8 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>订单结算 - 网上商城</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
     <style>
         .checkout-section {
@@ -332,27 +332,28 @@
         let html = '';
         
         products.forEach(function(item) {
-            html += `
-                <div class="product-item">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <img src="${pageContext.request.contextPath}/static/images/products/\${item.product.image || 'default.jpg'}" 
-                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;"
-                                 onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
-                        </div>
-                        <div class="col">
-                            <h6 class="mb-1">\${item.product.name}</h6>
-                            <p class="text-muted small mb-0">\${item.product.description}</p>
-                        </div>
-                        <div class="col-auto">
-                            <span class="text-muted">×\${item.quantity}</span>
-                        </div>
-                        <div class="col-auto">
-                            <span class="fw-bold">¥\${(item.product.price * item.quantity).toFixed(2)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+            const imageSrc = item.product.image || 'default.jpg';
+            const subtotal = (item.product.price * item.quantity).toFixed(2);
+            
+            html += '<div class="product-item">' +
+                    '<div class="row align-items-center">' +
+                    '<div class="col-auto">' +
+                    '<img src="${pageContext.request.contextPath}/static/images/products/' + imageSrc + '" ' +
+                    'class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" ' +
+                    'onerror="this.src=\'${pageContext.request.contextPath}/static/images/products/default.jpg\'">' +
+                    '</div>' +
+                    '<div class="col">' +
+                    '<h6 class="mb-1">' + item.product.name + '</h6>' +
+                    '<p class="text-muted small mb-0">' + item.product.description + '</p>' +
+                    '</div>' +
+                    '<div class="col-auto">' +
+                    '<span class="text-muted">×' + item.quantity + '</span>' +
+                    '</div>' +
+                    '<div class="col-auto">' +
+                    '<span class="fw-bold">¥' + subtotal + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
         });
         
         document.getElementById('productList').innerHTML = html;
@@ -386,18 +387,16 @@
         
         // 更新地址显示
         document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected'));
-        const newAddressHtml = `
-            <div class="address-item selected" data-address="\${newAddress}">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="mb-1">\${receiverName}</h6>
-                        <p class="mb-1">\${receiverPhone}</p>
-                        <p class="mb-0 text-muted">\${newAddress}</p>
-                    </div>
-                    <span class="badge bg-success">新地址</span>
-                </div>
-            </div>
-        `;
+        const newAddressHtml = '<div class="address-item selected" data-address="' + newAddress + '">' +
+            '<div class="d-flex justify-content-between align-items-start">' +
+            '<div>' +
+            '<h6 class="mb-1">' + receiverName + '</h6>' +
+            '<p class="mb-1">' + receiverPhone + '</p>' +
+            '<p class="mb-0 text-muted">' + newAddress + '</p>' +
+            '</div>' +
+            '<span class="badge bg-success">新地址</span>' +
+            '</div>' +
+            '</div>';
         
         const sectionContent = document.querySelector('.section-content');
         sectionContent.insertAdjacentHTML('afterbegin', newAddressHtml);
