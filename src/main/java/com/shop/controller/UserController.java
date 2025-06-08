@@ -1,7 +1,9 @@
 package com.shop.controller;
 
 import com.shop.entity.User;
+import com.shop.entity.Order;
 import com.shop.service.UserService;
+import com.shop.service.OrderService;
 import com.shop.util.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.Random;
+import java.util.List;
 
 /**
  * 用户控制器
@@ -19,6 +22,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 登录
@@ -195,7 +201,90 @@ public class UserController {
     }
 
     /**
-     * 模拟支付状态检查
+     * 提交订单并处理支付
+     * 先模拟支付，支付成功后创建订单
+     */
+    @ResponseBody
+    @PostMapping("/submitOrder")
+    public JsonResult<OrderSubmissionResult> submitOrder(@RequestParam("productIds") List<Integer> productIds,
+                                                        @RequestParam("paymentMethod") String paymentMethod,
+                                                        @RequestParam(value = "shippingAddress", required = false) String shippingAddress,
+                                                        HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+
+        if (productIds == null || productIds.isEmpty()) {
+            return JsonResult.error("请选择要购买的商品");
+        }
+
+        // 如果提供了新的收货地址，更新用户地址
+        if (shippingAddress != null && !shippingAddress.trim().isEmpty()) {
+            user.setAddress(shippingAddress.trim());
+        }
+
+        System.out.println("开始处理订单提交 - 用户ID: " + user.getId() + ", 商品数量: " + productIds.size() + ", 支付方式: " + paymentMethod);
+
+        // 模拟支付处理时间
+        try {
+            Thread.sleep(1000 + new Random().nextInt(2000)); // 1-3秒随机延迟
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // 随机生成支付结果 (80%成功率，提高成功率便于测试)
+        Random random = new Random();
+        boolean paymentSuccess = random.nextInt(100) < 80;
+        
+        OrderSubmissionResult result = new OrderSubmissionResult();
+        result.setPaymentMethod(paymentMethod);
+        result.setPaymentSuccess(paymentSuccess);
+        
+        if (paymentSuccess) {
+            // 支付成功，创建订单
+            try {
+                Either<Order> orderResult = orderService.createOrder(user, productIds);
+                if (orderResult.isSuccess()) {
+                    Order order = orderResult.result();
+                    // 更新订单状态为已支付
+                    orderService.updateStatus(order.getId(), 1);
+                    
+                    result.setOrderId(order.getId());
+                    result.setMessage("支付成功，订单已创建");
+                    result.setTransactionId("TXN" + System.currentTimeMillis() + random.nextInt(1000));
+                    
+                    System.out.println("订单创建成功 - 订单ID: " + order.getId() + ", 交易号: " + result.getTransactionId());
+                    
+                    return JsonResult.success("订单提交成功", result);
+                } else {
+                    result.setMessage("支付成功但订单创建失败：" + orderResult.error());
+                    System.out.println("订单创建失败: " + orderResult.error());
+                    return JsonResult.error("订单创建失败：" + orderResult.error());
+                }
+            } catch (Exception e) {
+                result.setMessage("支付成功但订单创建异常：" + e.getMessage());
+                System.out.println("订单创建异常: " + e.getMessage());
+                return JsonResult.error("订单创建异常：" + e.getMessage());
+            }
+        } else {
+            // 支付失败
+            String[] failureReasons = {
+                "余额不足", 
+                "银行卡被冻结", 
+                "网络超时", 
+                "支付密码错误", 
+                "银行系统维护中"
+            };
+            result.setMessage("支付失败：" + failureReasons[random.nextInt(failureReasons.length)]);
+            
+            System.out.println("支付失败: " + result.getMessage());
+            return JsonResult.error(result.getMessage(), result);
+        }
+    }
+
+    /**
+     * 模拟支付状态检查（保留原有接口兼容性）
      * 随机返回支付成功或失败，用于测试
      */
     @ResponseBody
@@ -210,8 +299,10 @@ public class UserController {
 
         // 验证订单是否存在且属于当前用户
         try {
-            // 这里应该注入OrderService来验证订单，但为了简化，我们先跳过验证
-            // 在实际应用中应该验证订单的有效性
+            Order order = orderService.findById(orderId);
+            if (order == null || order.getUserId() != user.getId()) {
+                return JsonResult.error("订单不存在或无权限访问");
+            }
         } catch (Exception e) {
             return JsonResult.error("订单验证失败");
         }
@@ -253,6 +344,33 @@ public class UserController {
         }
         
         return JsonResult.success("支付处理完成", result);
+    }
+
+    /**
+     * 订单提交结果内部类
+     */
+    public static class OrderSubmissionResult {
+        private Integer orderId;
+        private String paymentMethod;
+        private boolean paymentSuccess;
+        private String message;
+        private String transactionId;
+
+        // Getters and Setters
+        public Integer getOrderId() { return orderId; }
+        public void setOrderId(Integer orderId) { this.orderId = orderId; }
+        
+        public String getPaymentMethod() { return paymentMethod; }
+        public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+        
+        public boolean isPaymentSuccess() { return paymentSuccess; }
+        public void setPaymentSuccess(boolean paymentSuccess) { this.paymentSuccess = paymentSuccess; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        
+        public String getTransactionId() { return transactionId; }
+        public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
     }
 
     /**
