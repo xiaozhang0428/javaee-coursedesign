@@ -137,6 +137,10 @@
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
+<script>
+    // 设置应用上下文路径
+    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
+</script>
 <script src="${pageContext.request.contextPath}/static/js/cart.js"></script>
 </body>
 </html>
