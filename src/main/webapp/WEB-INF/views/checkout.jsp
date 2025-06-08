@@ -421,35 +421,66 @@
         
         const submitBtn = document.getElementById('submitOrderBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>提交中...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>处理中...';
+        
+        console.log('开始提交订单，商品数量:', selectedProducts.length, '支付方式:', selectedPaymentMethod);
         
         try {
             const productIds = selectedProducts.map(item => item.productId);
             
             const formData = new FormData();
             productIds.forEach(id => formData.append('productIds', id));
+            formData.append('paymentMethod', selectedPaymentMethod);
             formData.append('shippingAddress', selectedAddress);
             
-            const response = await fetch('${pageContext.request.contextPath}/order/create', {
+            console.log('发送订单提交请求...');
+            const response = await fetch('${pageContext.request.contextPath}/user/submitOrder', {
                 method: 'POST',
                 body: formData
             });
 
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+            }
+
             const result = await response.json();
+            console.log('订单提交响应:', result);
             
             if (result.success) {
-                showMessage('订单创建成功，正在跳转到支付...', {type: 'success'});
-                // 进入支付流程
-                setTimeout(function() {
-                    processPayment(result.data.id);
-                }, 1000);
+                const submissionResult = result.data;
+                
+                if (submissionResult.paymentSuccess) {
+                    // 支付成功，订单已创建
+                    showMessage('支付成功！订单已创建，订单号：' + submissionResult.orderId, {type: 'success'});
+                    console.log('订单创建成功，订单ID:', submissionResult.orderId);
+                    
+                    // 跳转到我的订单页面
+                    setTimeout(function() {
+                        window.location.href = '${pageContext.request.contextPath}/order/orders';
+                    }, 2000);
+                } else {
+                    // 支付失败
+                    showMessage('支付失败：' + submissionResult.message, {type: 'danger'});
+                    console.log('支付失败:', submissionResult.message);
+                    
+                    submitBtn.innerHTML = '<i class="fas fa-redo me-2"></i>重新支付';
+                    submitBtn.disabled = false;
+                    
+                    // 重新绑定点击事件进行重新支付
+                    submitBtn.onclick = function() {
+                        submitOrder();
+                    };
+                }
             } else {
-                showMessage('订单创建失败：' + result.message, {type: 'danger'});
+                // 请求失败
+                console.error('订单提交失败:', result.message);
+                showMessage('订单提交失败：' + result.message, {type: 'danger'});
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>提交订单';
             }
         } catch (error) {
-            showMessage('网络错误，请重试', {type: 'danger'});
+            console.error('订单提交错误:', error);
+            showMessage('网络错误，请重试：' + error.message, {type: 'danger'});
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>提交订单';
         }

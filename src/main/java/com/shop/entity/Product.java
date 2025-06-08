@@ -18,6 +18,7 @@ public class Product {
     private int sales;
     private String image;
     private int status;
-    private int categoryId;
-    private Date createTime;
+    // 注释掉数据库中不存在的字段
+    // private int categoryId;
+    // private Date createTime;
 }
