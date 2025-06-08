@@ -13,12 +13,10 @@
         <result property="sales" column="sales"/>
         <result property="image" column="image"/>
         <result property="status" column="status"/>
-        <result property="categoryId" column="category_id"/>
-        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <select id="findAll" resultMap="ProductResultMap">
-        SELECT * FROM products WHERE status = 1 ORDER BY create_time DESC
+        SELECT * FROM products WHERE status = 1 ORDER BY id DESC
     </select>
 
     <select id="findById" parameterType="int" resultMap="ProductResultMap">
@@ -40,7 +38,7 @@
                 ELSE 4
             END,
             sales DESC, 
-            create_time DESC
+            id DESC
     </select>
 
     <select id="searchByKeywordWithSort" resultMap="ProductResultMap">
@@ -67,11 +65,11 @@
             <when test="sort == 'sales_desc'">
                 sales DESC
             </when>
-            <when test="sort == 'create_time_desc'">
-                create_time DESC
+            <when test="sort == 'id_desc'">
+                id DESC
             </when>
             <otherwise>
-                sales DESC, create_time DESC
+                sales DESC, id DESC
             </otherwise>
         </choose>
     </select>
@@ -81,11 +79,11 @@
     </select>
 
     <select id="findLatestProducts" parameterType="int" resultMap="ProductResultMap">
-        SELECT * FROM products WHERE status = 1 ORDER BY create_time DESC LIMIT #{limit}
+        SELECT * FROM products WHERE status = 1 ORDER BY id DESC LIMIT #{limit}
     </select>
 
     <select id="findByPage" resultMap="ProductResultMap">
-        SELECT * FROM products WHERE status = 1 ORDER BY create_time DESC LIMIT #{offset}, #{limit}
+        SELECT * FROM products WHERE status = 1 ORDER BY id DESC LIMIT #{offset}, #{limit}
     </select>
 
     <select id="findByPageWithSort" resultMap="ProductResultMap">
@@ -100,11 +98,11 @@
             <when test="sort == 'sales_desc'">
                 ORDER BY sales DESC
             </when>
-            <when test="sort == 'create_time_desc'">
-                ORDER BY create_time DESC
+            <when test="sort == 'id_desc'">
+                ORDER BY id DESC
             </when>
             <otherwise>
-                ORDER BY create_time DESC
+                ORDER BY id DESC
             </otherwise>
         </choose>
         LIMIT #{offset}, #{limit}
@@ -115,8 +113,8 @@
     </select>
 
     <insert id="insert" parameterType="com.shop.entity.Product" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO products (name, description, price, stock, sales, image, status, category_id, create_time)
-        VALUES (#{name}, #{description}, #{price}, #{stock}, #{sales}, #{image}, #{status}, #{categoryId}, #{createTime})
+        INSERT INTO products (name, description, price, stock, sales, image, status)
+        VALUES (#{name}, #{description}, #{price}, #{stock}, #{sales}, #{image}, #{status})
     </insert>
 
     <update id="update" parameterType="com.shop.entity.Product">
@@ -126,8 +124,7 @@
             price = #{price},
             stock = #{stock},
             image = #{image},
-            status = #{status},
-            category_id = #{categoryId}
+            status = #{status}
         WHERE id = #{id}
     </update>
 
@@ -159,7 +156,7 @@
                 ELSE 4
             END,
             sales DESC, 
-            create_time DESC
+            id DESC
         LIMIT #{limit}
     </select>
 
