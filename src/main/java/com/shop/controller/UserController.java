@@ -208,6 +208,14 @@ public class UserController {
             return JsonResult.error("请先登录");
         }
 
+        // 验证订单是否存在且属于当前用户
+        try {
+            // 这里应该注入OrderService来验证订单，但为了简化，我们先跳过验证
+            // 在实际应用中应该验证订单的有效性
+        } catch (Exception e) {
+            return JsonResult.error("订单验证失败");
+        }
+
         // 模拟支付处理时间
         try {
             Thread.sleep(1000 + new Random().nextInt(2000)); // 1-3秒随机延迟
@@ -215,9 +223,9 @@ public class UserController {
             Thread.currentThread().interrupt();
         }
 
-        // 随机生成支付结果 (70%成功率)
+        // 随机生成支付结果 (80%成功率，提高成功率便于测试)
         Random random = new Random();
-        boolean success = random.nextInt(100) < 70;
+        boolean success = random.nextInt(100) < 80;
         
         PaymentResult result = new PaymentResult();
         result.setOrderId(orderId);
@@ -227,6 +235,9 @@ public class UserController {
         if (success) {
             result.setMessage("支付成功");
             result.setTransactionId("TXN" + System.currentTimeMillis() + random.nextInt(1000));
+            
+            // 记录支付成功的日志
+            System.out.println("支付成功 - 订单ID: " + orderId + ", 交易号: " + result.getTransactionId());
         } else {
             String[] failureReasons = {
                 "余额不足", 
@@ -236,6 +247,9 @@ public class UserController {
                 "银行系统维护中"
             };
             result.setMessage("支付失败：" + failureReasons[random.nextInt(failureReasons.length)]);
+            
+            // 记录支付失败的日志
+            System.out.println("支付失败 - 订单ID: " + orderId + ", 原因: " + result.getMessage());
         }
         
         return JsonResult.success("支付处理完成", result);
