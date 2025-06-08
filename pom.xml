@@ -181,13 +181,18 @@
                 <version>3.5.2</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>11.0.24</version>
                 <configuration>
-                    <port>12000</port>
-                    <path>/shop</path>
-                    <server>tomcat7</server>
+                    <httpConnector>
+                        <port>12000</port>
+                        <host>0.0.0.0</host>
+                    </httpConnector>
+                    <webApp>
+                        <contextPath>/javaee-coursedesign</contextPath>
+                    </webApp>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
                 </configuration>
             </plugin>
         </plugins>

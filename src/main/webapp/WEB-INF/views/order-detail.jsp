@@ -324,111 +324,126 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    function payOrder() {
+    // 设置应用上下文路径
+    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
+
+    async function payOrder() {
         // 模拟支付流程
-        if (confirm('确认支付 ${order.totalAmount} 元吗？')) {
-            $.ajax({
-                url: '${pageContext.request.contextPath}/order/updateStatus',
-                type: 'POST',
-                data: {
+        if (!confirm('确认支付 ${order.totalAmount} 元吗？')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
                     orderId: ${order.id},
                     status: 1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('支付成功！', 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showToast('支付失败：' + response.message, 'error');
-                    }
-                },
-                error: function() {
-                    showToast('网络错误，请重试', 'error');
-                }
+                })
             });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('支付成功！', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('支付失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
         }
     }
 
-    function cancelOrder() {
-        if (confirm('确认取消订单吗？取消后无法恢复。')) {
-            $.ajax({
-                url: '${pageContext.request.contextPath}/order/updateStatus',
-                type: 'POST',
-                data: {
+    async function cancelOrder() {
+        if (!confirm('确认取消订单吗？取消后无法恢复。')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
                     orderId: ${order.id},
                     status: -1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('订单已取消', 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showToast('取消失败：' + response.message, 'error');
-                    }
-                },
-                error: function() {
-                    showToast('网络错误，请重试', 'error');
-                }
+                })
             });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('订单已取消', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('取消失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
         }
     }
 
-    function confirmReceive() {
-        if (confirm('确认已收到商品吗？')) {
-            $.ajax({
-                url: '${pageContext.request.contextPath}/order/updateStatus',
-                type: 'POST',
-                data: {
+    async function confirmReceive() {
+        if (!confirm('确认已收到商品吗？')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
                     orderId: ${order.id},
                     status: 3
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('确认收货成功！', 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showToast('操作失败：' + response.message, 'error');
-                    }
-                },
-                error: function() {
-                    showToast('网络错误，请重试', 'error');
-                }
+                })
             });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('确认收货成功！', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('操作失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
         }
     }
 
-    function buyAgain() {
-        // 重新购买功能
-        const productIds = [<c:forEach var="item" items="${order.orderItems}" varStatus="status">${item.productId}<c:if test="${!status.last}">,</c:if></c:forEach>];
-        
-        $.ajax({
-            url: '${pageContext.request.contextPath}/cart/addBatch',
-            type: 'POST',
-            data: { productIds: productIds },
-            success: function(response) {
-                if (response.success) {
-                    showToast('商品已加入购物车', 'success');
-                    setTimeout(function() {
-                        window.location.href = '${pageContext.request.contextPath}/cart';
-                    }, 1500);
-                } else {
-                    showToast('添加失败：' + response.message, 'error');
-                }
-            },
-            error: function() {
-                showToast('网络错误，请重试', 'error');
+    async function buyAgain() {
+        try {
+            showMessage('正在添加到购物车...', {type: 'primary'});
+            
+            const response = await fetch('${pageContext.request.contextPath}/order/buyAgain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({orderId: ${order.id}})
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('商品已添加到购物车', {type: 'success'});
+                setTimeout(function() {
+                    window.location.href = '${pageContext.request.contextPath}/cart/';
+                }, 1500);
+            } else {
+                showMessage('添加失败：' + result.message, {type: 'danger'});
             }
-        });
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
+        }
     }
 
     function writeReview() {
-        showToast('评价功能开发中...', 'info');
+        showMessage('评价功能开发中...', {type: 'primary'});
     }
 </script>
 </body>

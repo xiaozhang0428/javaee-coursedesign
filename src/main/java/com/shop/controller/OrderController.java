@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/order")
@@ -39,7 +40,7 @@ public class OrderController {
      * 订单详情页面
      */
     @RequestMapping("/detail/{id}")
-    public String orderDetail(@PathVariable int id, HttpSession session, Model model) {
+    public String orderDetail(@PathVariable("id") int id, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/user/login";
@@ -119,13 +120,38 @@ public class OrderController {
             return JsonResult.error("订单不存在");
         }
 
-        // 只允许用户取消待支付的订单
-        if (status == -1 && order.getStatus() == 0) {
-            boolean success = orderService.updateStatus(orderId, -1);
-            return success ? JsonResult.success("订单已取消") : JsonResult.error("取消失败");
+        // 根据当前状态和目标状态判断是否允许操作
+        switch (status) {
+            case -1: // 取消订单
+                if (order.getStatus() == 0) {
+                    boolean success = orderService.updateStatus(orderId, -1);
+                    return success ? JsonResult.success("订单已取消") : JsonResult.error("取消失败");
+                } else {
+                    return JsonResult.error("只能取消待支付的订单");
+                }
+            
+            case 1: // 支付订单
+                if (order.getStatus() == 0) {
+                    boolean success = orderService.updateStatus(orderId, 1);
+                    return success ? JsonResult.success("支付成功") : JsonResult.error("支付失败");
+                } else {
+                    return JsonResult.error("订单状态不正确，无法支付");
+                }
+            
+            case 2: // 发货（管理员操作，这里暂不实现）
+                return JsonResult.error("无权限执行此操作");
+            
+            case 3: // 确认收货
+                if (order.getStatus() == 2) {
+                    boolean success = orderService.updateStatus(orderId, 3);
+                    return success ? JsonResult.success("确认收货成功") : JsonResult.error("确认收货失败");
+                } else {
+                    return JsonResult.error("订单状态不正确，无法确认收货");
+                }
+            
+            default:
+                return JsonResult.error("无效的状态参数");
         }
-
-        return JsonResult.error("操作不允许");
     }
 
     /**
@@ -152,5 +178,36 @@ public class OrderController {
         }
 
         return JsonResult.success(orders);
+    }
+
+    /**
+     * 再次购买（将订单中的商品添加到购物车）
+     */
+    @PostMapping("/buyAgain")
+    @ResponseBody
+    public JsonResult<String> buyAgain(@RequestBody Map<String, Integer> request,
+                                      HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+
+        Integer orderId = request.get("orderId");
+        if (orderId == null) {
+            return JsonResult.error("订单ID不能为空");
+        }
+
+        // 验证订单是否属于当前用户
+        Order order = orderService.findById(orderId);
+        if (order == null || order.getUserId() != user.getId()) {
+            return JsonResult.error("订单不存在");
+        }
+
+        Either<String> result = orderService.buyAgain(user.getId(), orderId);
+        if (!result.isSuccess()) {
+            return JsonResult.error(result.error());
+        }
+
+        return JsonResult.success(result.result());
     }
 }

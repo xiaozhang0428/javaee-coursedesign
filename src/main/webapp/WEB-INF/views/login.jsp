@@ -62,6 +62,9 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
+    // 设置应用上下文路径
+    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
+    
     document.querySelector('#login').addEventListener('click', event => {
         event.preventDefault()
         const form = document.querySelector('#loginForm');
@@ -77,7 +80,7 @@
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
-            .catch(error => showMessage(error.message, 'danger'))
+            .catch(error => showMessage(error.message, {type: 'danger'}))
     });
 </script>
 </body>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -185,7 +186,8 @@
                                    class="btn btn-sm btn-outline-primary mb-1">查看详情</a><br>
                                 <c:choose>
                                   <c:when test="${order.status == 0}">
-                                    <button class="btn btn-sm btn-primary" onclick="payOrder(${order.id})">立即支付</button>
+                                    <button class="btn btn-sm btn-primary mb-1" onclick="payOrder(${order.id})">立即支付</button><br>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(${order.id})">取消订单</button>
                                   </c:when>
                                   <c:when test="${order.status == 2}">
                                     <button class="btn btn-sm btn-success" onclick="confirmReceive(${order.id})">确认收货</button>
@@ -219,21 +221,26 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    $(document).ready(function() {
+    // 设置应用上下文路径
+    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
+
+    document.addEventListener('DOMContentLoaded', function() {
         // 订单状态筛选
-        $('input[name="orderStatus"]').on('change', function () {
-            var status = $(this).val();
-            filterOrders(status);
+        document.querySelectorAll('input[name="orderStatus"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                filterOrders(this.value);
+            });
         });
     });
 
     function filterOrders(status) {
+        const orderCards = document.querySelectorAll('.order-card');
+        
         if (status === '') {
             // 显示所有订单
-            $('.order-card').show();
+            orderCards.forEach(card => card.style.display = 'block');
         } else {
             // 根据状态筛选订单
-            $('.order-card').hide();
             let statusValue;
             switch(status) {
                 case 'pending': statusValue = 0; break;
@@ -242,68 +249,136 @@
                 case 'delivered': statusValue = 3; break;
                 default: statusValue = -1;
             }
-            $('.order-card[data-status="' + statusValue + '"]').show();
-        }
-    }
-
-    function payOrder(orderId) {
-        if (confirm('确认支付此订单吗？')) {
-            $.ajax({
-                url: '${pageContext.request.contextPath}/order/updateStatus',
-                type: 'POST',
-                data: {
-                    orderId: orderId,
-                    status: 1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('支付成功！', 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showToast('支付失败：' + response.message, 'error');
-                    }
-                },
-                error: function() {
-                    showToast('网络错误，请重试', 'error');
+            
+            orderCards.forEach(card => {
+                if (card.dataset.status == statusValue) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         }
     }
 
-    function confirmReceive(orderId) {
-        if (confirm('确认已收到商品吗？')) {
-            $.ajax({
-                url: '${pageContext.request.contextPath}/order/updateStatus',
-                type: 'POST',
-                data: {
-                    orderId: orderId,
-                    status: 3
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('确认收货成功！', 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showToast('操作失败：' + response.message, 'error');
-                    }
-                },
-                error: function() {
-                    showToast('网络错误，请重试', 'error');
-                }
+    async function payOrder(orderId) {
+        if (!confirm('确认支付此订单吗？')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('orderId', orderId);
+            formData.append('status', 1);
+
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                body: formData
             });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('支付成功！', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('支付失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
         }
     }
 
-    function buyAgain(orderId) {
-        showToast('正在添加到购物车...', 'info');
-        // 这里可以实现再次购买的逻辑
-        setTimeout(function() {
-            showToast('功能开发中...', 'info');
-        }, 1000);
+    async function confirmReceive(orderId) {
+        if (!confirm('确认已收到商品吗？')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('orderId', orderId);
+            formData.append('status', 3);
+
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('确认收货成功！', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('操作失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
+        }
+    }
+
+    async function cancelOrder(orderId) {
+        if (!confirm('确认取消此订单吗？')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('orderId', orderId);
+            formData.append('status', -1);
+
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('订单已取消', {type: 'success', reload: true, redirectDelay: 1500});
+            } else {
+                showMessage('取消失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
+        }
+    }
+
+    async function buyAgain(orderId) {
+        try {
+            showMessage('正在添加到购物车...', {type: 'primary'});
+            
+            const response = await fetch('${pageContext.request.contextPath}/order/buyAgain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({orderId: orderId})
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('商品已添加到购物车', {type: 'success'});
+                // 更新购物车数量显示
+                updateCartCount();
+            } else {
+                showMessage('添加失败：' + result.message, {type: 'danger'});
+            }
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
+        }
+    }
+
+    // 更新购物车数量显示
+    async function updateCartCount() {
+        try {
+            const count = await getCartCount();
+            const cartCountElement = document.querySelector('.cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+            }
+        } catch (error) {
+            console.error('更新购物车数量失败:', error);
+        }
     }
 </script>
 </body>

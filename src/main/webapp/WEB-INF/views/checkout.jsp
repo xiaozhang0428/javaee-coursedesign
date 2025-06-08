@@ -250,12 +250,15 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
+    // 设置应用上下文路径
+    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
+    
     let selectedProducts = [];
     let selectedAddress = '${user.address}';
     let selectedPaymentMethod = 'alipay';
     let totalAmount = 0;
 
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // 获取商品ID列表
         const urlParams = new URLSearchParams(window.location.search);
         const productIdsParam = urlParams.get('productIds');
@@ -263,7 +266,7 @@
         console.log('Product IDs:', productIds);
         
         if (productIds.length === 0) {
-            showMessage('没有选择商品', {type: 'error'});
+            showMessage('没有选择商品', {type: 'danger'});
             return;
         }
         
@@ -271,55 +274,57 @@
         loadProducts(productIds);
         
         // 地址选择
-        $('.address-item').click(function() {
-            $('.address-item').removeClass('selected');
-            $(this).addClass('selected');
-            selectedAddress = $(this).data('address');
+        document.querySelectorAll('.address-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedAddress = this.dataset.address;
+            });
         });
         
         // 支付方式选择
-        $('.payment-method').click(function() {
-            $('.payment-method').removeClass('selected');
-            $(this).addClass('selected');
-            selectedPaymentMethod = $(this).data('method');
+        document.querySelectorAll('.payment-method').forEach(function(method) {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPaymentMethod = this.dataset.method;
+            });
         });
         
         // 提交订单
-        $('#submitOrderBtn').click(function() {
+        document.getElementById('submitOrderBtn').addEventListener('click', function() {
             submitOrder();
         });
     });
 
-    function loadProducts(productIds) {
+    async function loadProducts(productIds) {
         console.log('Loading products for IDs:', productIds);
         
-        // 构建表单数据
-        var formData = new FormData();
-        productIds.forEach(function(id) {
-            formData.append('productIds', id);
-        });
-        
-        $.ajax({
-            url: '${pageContext.request.contextPath}/cart/getSelectedItems',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                console.log('AJAX Response:', response);
-                if (response.success) {
-                    displayProducts(response.data);
-                    calculateTotal();
-                } else {
-                    showMessage('加载商品信息失败：' + response.message, {type: 'error'});
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-                console.error('Response:', xhr.responseText);
-                showMessage('网络错误，请重试', {type: 'error'});
+        try {
+            // 构建表单数据
+            const formData = new FormData();
+            productIds.forEach(function(id) {
+                formData.append('productIds', id);
+            });
+            
+            const response = await fetch('${pageContext.request.contextPath}/cart/getSelectedItems', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            console.log('Response:', result);
+            
+            if (result.success) {
+                displayProducts(result.data);
+                calculateTotal();
+            } else {
+                showMessage('加载商品信息失败：' + result.message, {type: 'danger'});
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('网络错误，请重试', {type: 'danger'});
+        }
     }
 
     function displayProducts(products) {
@@ -350,7 +355,7 @@
             `;
         });
         
-        $('#productList').html(html);
+        document.getElementById('productList').innerHTML = html;
     }
 
     function calculateTotal() {
@@ -360,27 +365,27 @@
         });
         
         totalAmount = subtotal;
-        $('#subtotal').text('¥' + subtotal.toFixed(2));
-        $('#totalAmount').text('¥' + totalAmount.toFixed(2));
+        document.getElementById('subtotal').textContent = '¥' + subtotal.toFixed(2);
+        document.getElementById('totalAmount').textContent = '¥' + totalAmount.toFixed(2);
         
         // 启用提交按钮
-        $('#submitOrderBtn').prop('disabled', false);
+        document.getElementById('submitOrderBtn').disabled = false;
     }
 
     function useNewAddress() {
-        const receiverName = $('#newReceiverName').val().trim();
-        const receiverPhone = $('#newReceiverPhone').val().trim();
-        const newAddress = $('#newAddress').val().trim();
+        const receiverName = document.getElementById('newReceiverName').value.trim();
+        const receiverPhone = document.getElementById('newReceiverPhone').value.trim();
+        const newAddress = document.getElementById('newAddress').value.trim();
         
         if (!receiverName || !receiverPhone || !newAddress) {
-            showMessage('请填写完整的地址信息', {type: 'error'});
+            showMessage('请填写完整的地址信息', {type: 'danger'});
             return;
         }
         
         selectedAddress = newAddress;
         
         // 更新地址显示
-        $('.address-item').removeClass('selected');
+        document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected'));
         const newAddressHtml = `
             <div class="address-item selected" data-address="\${newAddress}">
                 <div class="d-flex justify-content-between align-items-start">
@@ -394,51 +399,62 @@
             </div>
         `;
         
-        $('.section-content').prepend(newAddressHtml);
-        $('#newAddressForm').collapse('hide');
+        const sectionContent = document.querySelector('.section-content');
+        sectionContent.insertAdjacentHTML('afterbegin', newAddressHtml);
+        
+        // 隐藏新地址表单
+        const newAddressForm = document.getElementById('newAddressForm');
+        const collapse = new bootstrap.Collapse(newAddressForm, {toggle: false});
+        collapse.hide();
         
         showMessage('地址已更新', {type: 'success'});
     }
 
-    function submitOrder() {
+    async function submitOrder() {
         if (!selectedAddress) {
-            showMessage('请选择收货地址', {type: 'error'});
+            showMessage('请选择收货地址', {type: 'danger'});
             return;
         }
         
         if (selectedProducts.length === 0) {
-            showMessage('没有选择商品', {type: 'error'});
+            showMessage('没有选择商品', {type: 'danger'});
             return;
         }
         
-        $('#submitOrderBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>提交中...');
+        const submitBtn = document.getElementById('submitOrderBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>提交中...';
         
-        const productIds = selectedProducts.map(item => item.productId);
-        
-        $.ajax({
-            url: '${pageContext.request.contextPath}/order/create',
-            type: 'POST',
-            data: {
-                productIds: productIds,
-                shippingAddress: selectedAddress
-            },
-            success: function(response) {
-                if (response.success) {
-                    showMessage('订单创建成功！', {type: 'success'});
-                    // 跳转到订单详情页面
-                    setTimeout(function() {
-                        window.location.href = '${pageContext.request.contextPath}/order/detail/' + response.data.id;
-                    }, 1500);
-                } else {
-                    showToast('订单创建失败：' + response.message, 'error');
-                    $('#submitOrderBtn').prop('disabled', false).html('<i class="fas fa-lock me-2"></i>提交订单');
-                }
-            },
-            error: function() {
-                showMessage('网络错误，请重试', {type: 'error'});
-                $('#submitOrderBtn').prop('disabled', false).html('<i class="fas fa-lock me-2"></i>提交订单');
+        try {
+            const productIds = selectedProducts.map(item => item.productId);
+            
+            const formData = new FormData();
+            productIds.forEach(id => formData.append('productIds', id));
+            formData.append('shippingAddress', selectedAddress);
+            
+            const response = await fetch('${pageContext.request.contextPath}/order/create', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('订单创建成功！', {type: 'success'});
+                // 跳转到订单详情页面
+                setTimeout(function() {
+                    window.location.href = '${pageContext.request.contextPath}/order/detail/' + result.data.id;
+                }, 1500);
+            } else {
+                showMessage('订单创建失败：' + result.message, {type: 'danger'});
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>提交订单';
             }
-        });
+        } catch (error) {
+            showMessage('网络错误，请重试', {type: 'danger'});
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>提交订单';
+        }
     }
 </script>
 </body>
