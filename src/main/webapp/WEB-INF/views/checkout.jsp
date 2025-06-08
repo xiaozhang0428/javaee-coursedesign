@@ -7,8 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>订单结算 - 网上商城</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
     <style>
         .checkout-section {
@@ -261,8 +261,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // 获取商品ID列表
         const urlParams = new URLSearchParams(window.location.search);
-        const productIdsParam = urlParams.get('productIds');
-        const productIds = productIdsParam ? productIdsParam.split(',').map(id => parseInt(id)) : [];
+        const productIds = urlParams.getAll('productIds').map(id => parseInt(id));
         console.log('Product IDs:', productIds);
         
         if (productIds.length === 0) {
@@ -332,27 +331,28 @@
         let html = '';
         
         products.forEach(function(item) {
-            html += `
-                <div class="product-item">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <img src="${pageContext.request.contextPath}/static/images/products/\${item.product.image || 'default.jpg'}" 
-                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;"
-                                 onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
-                        </div>
-                        <div class="col">
-                            <h6 class="mb-1">\${item.product.name}</h6>
-                            <p class="text-muted small mb-0">\${item.product.description}</p>
-                        </div>
-                        <div class="col-auto">
-                            <span class="text-muted">×\${item.quantity}</span>
-                        </div>
-                        <div class="col-auto">
-                            <span class="fw-bold">¥\${(item.product.price * item.quantity).toFixed(2)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+            const imageSrc = item.product.image || 'default.jpg';
+            const subtotal = (item.product.price * item.quantity).toFixed(2);
+            
+            html += '<div class="product-item">' +
+                    '<div class="row align-items-center">' +
+                    '<div class="col-auto">' +
+                    '<img src="${pageContext.request.contextPath}/static/images/products/' + imageSrc + '" ' +
+                    'class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" ' +
+                    'onerror="this.src=\'${pageContext.request.contextPath}/static/images/products/default.jpg\'">' +
+                    '</div>' +
+                    '<div class="col">' +
+                    '<h6 class="mb-1">' + item.product.name + '</h6>' +
+                    '<p class="text-muted small mb-0">' + item.product.description + '</p>' +
+                    '</div>' +
+                    '<div class="col-auto">' +
+                    '<span class="text-muted">×' + item.quantity + '</span>' +
+                    '</div>' +
+                    '<div class="col-auto">' +
+                    '<span class="fw-bold">¥' + subtotal + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
         });
         
         document.getElementById('productList').innerHTML = html;
@@ -386,18 +386,16 @@
         
         // 更新地址显示
         document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected'));
-        const newAddressHtml = `
-            <div class="address-item selected" data-address="\${newAddress}">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="mb-1">\${receiverName}</h6>
-                        <p class="mb-1">\${receiverPhone}</p>
-                        <p class="mb-0 text-muted">\${newAddress}</p>
-                    </div>
-                    <span class="badge bg-success">新地址</span>
-                </div>
-            </div>
-        `;
+        const newAddressHtml = '<div class="address-item selected" data-address="' + newAddress + '">' +
+            '<div class="d-flex justify-content-between align-items-start">' +
+            '<div>' +
+            '<h6 class="mb-1">' + receiverName + '</h6>' +
+            '<p class="mb-1">' + receiverPhone + '</p>' +
+            '<p class="mb-0 text-muted">' + newAddress + '</p>' +
+            '</div>' +
+            '<span class="badge bg-success">新地址</span>' +
+            '</div>' +
+            '</div>';
         
         const sectionContent = document.querySelector('.section-content');
         sectionContent.insertAdjacentHTML('afterbegin', newAddressHtml);
@@ -440,11 +438,11 @@
             const result = await response.json();
             
             if (result.success) {
-                showMessage('订单创建成功！', {type: 'success'});
-                // 跳转到订单详情页面
+                showMessage('订单创建成功，正在跳转到支付...', {type: 'success'});
+                // 进入支付流程
                 setTimeout(function() {
-                    window.location.href = '${pageContext.request.contextPath}/order/detail/' + result.data.id;
-                }, 1500);
+                    processPayment(result.data.id);
+                }, 1000);
             } else {
                 showMessage('订单创建失败：' + result.message, {type: 'danger'});
                 submitBtn.disabled = false;
@@ -454,6 +452,77 @@
             showMessage('网络错误，请重试', {type: 'danger'});
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>提交订单';
+        }
+    }
+
+    async function processPayment(orderId) {
+        const submitBtn = document.getElementById('submitOrderBtn');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>支付中...';
+        
+        try {
+            const formData = new FormData();
+            formData.append('orderId', orderId);
+            formData.append('paymentMethod', selectedPaymentMethod);
+            
+            const response = await fetch('${pageContext.request.contextPath}/user/payment/status', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                const paymentResult = result.data;
+                
+                if (paymentResult.success) {
+                    // 支付成功，更新订单状态
+                    await updateOrderStatus(orderId, 1);
+                    showMessage('支付成功！订单已完成', {type: 'success'});
+                    
+                    // 跳转到订单详情页面
+                    setTimeout(function() {
+                        window.location.href = '${pageContext.request.contextPath}/order/detail/' + orderId;
+                    }, 2000);
+                } else {
+                    // 支付失败
+                    showMessage('支付失败：' + paymentResult.message, {type: 'danger'});
+                    submitBtn.innerHTML = '<i class="fas fa-redo me-2"></i>重新支付';
+                    submitBtn.disabled = false;
+                    
+                    // 重新绑定点击事件进行重新支付
+                    submitBtn.onclick = function() {
+                        processPayment(orderId);
+                    };
+                }
+            } else {
+                showMessage('支付处理失败：' + result.message, {type: 'danger'});
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-redo me-2"></i>重新支付';
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            showMessage('支付网络错误，请重试', {type: 'danger'});
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-redo me-2"></i>重新支付';
+        }
+    }
+
+    async function updateOrderStatus(orderId, status) {
+        try {
+            const formData = new FormData();
+            formData.append('orderId', orderId);
+            formData.append('status', status);
+            
+            const response = await fetch('${pageContext.request.contextPath}/order/updateStatus', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            return result.success;
+        } catch (error) {
+            console.error('Update order status error:', error);
+            return false;
         }
     }
 </script>
