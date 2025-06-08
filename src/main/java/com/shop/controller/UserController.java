@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.Random;
 
 /**
  * 用户控制器
@@ -191,5 +192,79 @@ public class UserController {
         } else {
             return JsonResult.error("密码修改失败");
         }
+    }
+
+    /**
+     * 模拟支付状态检查
+     * 随机返回支付成功或失败，用于测试
+     */
+    @ResponseBody
+    @PostMapping("/payment/status")
+    public JsonResult<PaymentResult> checkPaymentStatus(@RequestParam("orderId") Integer orderId, 
+                                                       @RequestParam("paymentMethod") String paymentMethod,
+                                                       HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return JsonResult.error("请先登录");
+        }
+
+        // 模拟支付处理时间
+        try {
+            Thread.sleep(1000 + new Random().nextInt(2000)); // 1-3秒随机延迟
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // 随机生成支付结果 (70%成功率)
+        Random random = new Random();
+        boolean success = random.nextInt(100) < 70;
+        
+        PaymentResult result = new PaymentResult();
+        result.setOrderId(orderId);
+        result.setPaymentMethod(paymentMethod);
+        result.setSuccess(success);
+        
+        if (success) {
+            result.setMessage("支付成功");
+            result.setTransactionId("TXN" + System.currentTimeMillis() + random.nextInt(1000));
+        } else {
+            String[] failureReasons = {
+                "余额不足", 
+                "银行卡被冻结", 
+                "网络超时", 
+                "支付密码错误", 
+                "银行系统维护中"
+            };
+            result.setMessage("支付失败：" + failureReasons[random.nextInt(failureReasons.length)]);
+        }
+        
+        return JsonResult.success("支付处理完成", result);
+    }
+
+    /**
+     * 支付结果内部类
+     */
+    public static class PaymentResult {
+        private Integer orderId;
+        private String paymentMethod;
+        private boolean success;
+        private String message;
+        private String transactionId;
+
+        // Getters and Setters
+        public Integer getOrderId() { return orderId; }
+        public void setOrderId(Integer orderId) { this.orderId = orderId; }
+        
+        public String getPaymentMethod() { return paymentMethod; }
+        public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+        
+        public boolean isSuccess() { return success; }
+        public void setSuccess(boolean success) { this.success = success; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        
+        public String getTransactionId() { return transactionId; }
+        public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
     }
 }
