@@ -45,4 +45,9 @@ public interface OrderService {
      * 根据用户ID统计订单数
      */
     int countByUserId(int userId);
+    
+    /**
+     * 再次购买（将订单中的商品添加到购物车）
+     */
+    Either<String> buyAgain(int userId, int orderId);
 }
