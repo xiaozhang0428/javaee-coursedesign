@@ -13,9 +13,10 @@ public class OrderItem {
     private int orderId;
     private int productId;
     private int quantity;
-    private String productName;  // 添加商品名称字段
-    // 注释掉数据库中不存在的price字段
-    // private BigDecimal price;
+    private String productName;  // 商品名称
+    private BigDecimal productPrice;  // 商品价格
+    private BigDecimal subtotal;  // 小计
+    private BigDecimal price;  // 商品单价（可选字段）
 
     private Product product;
 
@@ -25,18 +26,26 @@ public class OrderItem {
         orderItem.productId = productId;
         orderItem.quantity = quantity;
         orderItem.productName = product != null ? product.getName() : ""; // 设置商品名称
-        // orderItem.price = price; // 数据库中暂时没有price字段
+        orderItem.productPrice = product != null ? product.getPrice() : BigDecimal.ZERO; // 设置商品价格
+        orderItem.subtotal = orderItem.productPrice.multiply(BigDecimal.valueOf(quantity)); // 计算小计
+        orderItem.price = orderItem.productPrice; // 设置单价（与productPrice相同）
         orderItem.product = product;
         return orderItem;
     }
     
-    // 添加一个方法来获取商品价格（从关联的Product对象中获取）
+    // 获取商品价格（优先使用productPrice字段，如果为空则从Product对象获取）
     public BigDecimal getPrice() {
+        if (productPrice != null) {
+            return productPrice;
+        }
         return product != null ? product.getPrice() : BigDecimal.ZERO;
     }
     
-    // 添加一个方法来计算总价
+    // 计算总价（优先使用subtotal字段，如果为空则计算）
     public BigDecimal getTotalPrice() {
+        if (subtotal != null) {
+            return subtotal;
+        }
         return getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }
