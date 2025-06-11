@@ -134,4 +134,47 @@ public class OrderServiceImpl implements OrderService {
     public int countByUserId(int userId) {
         return orderMapper.countByUserId(userId);
     }
+
+    @Override
+    public Either<String> buyAgain(int userId, int orderId) {
+        // 获取订单详情
+        Order order = findById(orderId);
+        if (order == null) {
+            return Either.error("订单不存在");
+        }
+        
+        if (order.getUserId() != userId) {
+            return Either.error("无权限操作此订单");
+        }
+        
+        // 获取订单商品列表
+        List<OrderItem> orderItems = order.getOrderItems();
+        if (orderItems == null || orderItems.isEmpty()) {
+            return Either.error("订单中没有商品");
+        }
+        
+        int addedCount = 0;
+        StringBuilder errorMessages = new StringBuilder();
+        
+        // 将订单中的商品添加到购物车
+        for (OrderItem item : orderItems) {
+            String result = cartService.addToCart(userId, item.getProductId(), item.getQuantity());
+            if (result == null) {
+                addedCount++;
+            } else {
+                if (errorMessages.length() > 0) {
+                    errorMessages.append("; ");
+                }
+                errorMessages.append(item.getProduct().getName()).append(": ").append(result);
+            }
+        }
+        
+        if (addedCount == 0) {
+            return Either.error("所有商品添加失败: " + errorMessages.toString());
+        } else if (addedCount < orderItems.size()) {
+            return Either.error("部分商品添加成功(" + addedCount + "/" + orderItems.size() + "), 失败原因: " + errorMessages.toString());
+        } else {
+            return Either.of("成功添加 " + addedCount + " 件商品到购物车");
+        }
+    }
 }

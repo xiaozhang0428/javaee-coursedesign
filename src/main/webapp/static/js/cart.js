@@ -29,10 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTotal();
     })
 
-    document.querySelectorAll('.item-checkbox').forEach(el => el.addEventListener('change', () => {
-        updateTotal();
-        updateSelectAll();
-    }))
+    // 使用事件委托处理复选框变化
+    document.addEventListener('change', (event) => {
+        if (event.target.classList.contains('item-checkbox')) {
+            updateTotal();
+            updateSelectAll();
+        }
+    });
 
     // + -
     document.querySelectorAll('.quantity-btn').forEach(btn => btn.addEventListener('click', () => {
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#checkoutBtn').addEventListener('click', event => {
         const selectedItems = document.querySelectorAll('.item-checkbox:checked');
         if (selectedItems.length === 0) {
-            showToast('请选择要结算的商品', 'error');
+            showMessage('请选择要结算的商品', 'danger');
             return;
         }
         
@@ -125,7 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams();
         productIds.forEach(id => params.append('productIds', id));
         
-        window.location.href = '/javaee-coursedesign/order/checkout?' + params.toString();
+        // 使用动态上下文路径
+        const contextPath = window.APP_CONTEXT_PATH || '';
+        window.location.href = contextPath + '/order/checkout?' + params.toString();
     })
 
 })

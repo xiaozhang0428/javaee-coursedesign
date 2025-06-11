@@ -94,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
         if (product == null) {
             return false;
         }
-        product.setCreateTime(new Date());
+        // product.setCreateTime(new Date()); // 数据库中暂时没有create_time字段
         return productMapper.insert(product) > 0;
     }
     
