@@ -40,8 +40,9 @@
                 <result property="description" column="p_description"/>
                 <result property="price" column="p_price"/>
                 <result property="image" column="p_image"/>
-                <result property="categoryId" column="p_category_id"/>
                 <result property="stock" column="p_stock"/>
+                <result property="sales" column="p_sales"/>
+                <result property="status" column="p_status"/>
             </association>
         </collection>
     </resultMap>
@@ -61,7 +62,7 @@
                oi.id as item_id, oi.order_id, oi.product_id, oi.quantity, 
                oi.product_name, oi.product_price, oi.subtotal, oi.price as item_price,
                p.name as p_name, p.description as p_description, p.price as p_price,
-               p.image as p_image, p.category_id as p_category_id, p.stock as p_stock
+               p.image as p_image, p.stock as p_stock, p.sales as p_sales, p.status as p_status
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         LEFT JOIN order_items oi ON o.id = oi.order_id
@@ -77,7 +78,7 @@
                oi.id as item_id, oi.order_id, oi.product_id, oi.quantity, 
                oi.product_name, oi.product_price, oi.subtotal, oi.price as item_price,
                p.name as p_name, p.description as p_description, p.price as p_price,
-               p.image as p_image, p.category_id as p_category_id, p.stock as p_stock
+               p.image as p_image, p.stock as p_stock, p.sales as p_sales, p.status as p_status
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         LEFT JOIN order_items oi ON o.id = oi.order_id
