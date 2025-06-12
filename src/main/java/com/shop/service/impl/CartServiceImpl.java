@@ -84,13 +84,4 @@ public class CartServiceImpl implements CartService {
     public boolean clearCart(int userId) {
         return cartMapper.deleteByUserId(userId) > 0;
     }
-
-    @Override
-    public double getTotalAmount(int userId) {
-        return findByUserId(userId).stream()
-                .filter(cart -> cart.getProduct() != null && cart.getProduct().getPrice() != null)
-                .map(cart -> cart.getProduct().getPrice().multiply(new BigDecimal(cart.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .doubleValue();
-    }
 }

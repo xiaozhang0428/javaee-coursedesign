@@ -17,7 +17,7 @@ import java.util.Map;
  * 搜索控制器
  */
 @Controller
-@RequestMapping("/api/search")
+@RequestMapping("/search")
 public class SearchController {
 
     @Autowired

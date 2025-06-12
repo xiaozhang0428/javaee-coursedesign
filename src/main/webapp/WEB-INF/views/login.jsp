@@ -27,11 +27,8 @@
               <label for="username" class="form-label">用户名</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-user"></i></span>
-                <input type="text" class="form-control" id="username" name="username"
-                       placeholder="请输入用户名" required>
-                <div class="invalid-feedback">
-                  用户名不能为空
-                </div>
+                <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" required>
+                <div class="invalid-feedback">用户名不能为空</div>
               </div>
             </div>
 
@@ -39,11 +36,8 @@
               <label for="password" class="form-label">密码</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                <input type="password" class="form-control" id="password" name="password"
-                       placeholder="请输入密码" required>
-                <div class="invalid-feedback">
-                  密码不能为空
-                </div>
+                <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+                <div class="invalid-feedback">密码不能为空</div>
               </div>
             </div>
 
@@ -62,9 +56,6 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    // 设置应用上下文路径
-    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
-    
     document.querySelector('#login').addEventListener('click', event => {
         event.preventDefault()
         const form = document.querySelector('#loginForm');

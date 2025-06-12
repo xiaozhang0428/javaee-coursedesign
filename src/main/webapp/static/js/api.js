@@ -210,3 +210,19 @@ async function checkoutCart(productIds) {
     const result = await post('/cart/checkout', productIds);
     return result.message;
 }
+
+// search
+
+/**
+ * 搜索建议
+ *
+ * @param keyword {string}
+ * @param limit {number} 建议数量
+ * @returns {Promise<string[]>}
+ */
+async function getSuggestions(keyword, limit) {
+    if (keyword.length === 0) return [];
+
+    const result = await get("/search/suggestions", {keyword, limit});
+    return result.data;
+}

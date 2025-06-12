@@ -9,14 +9,9 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
 
     /**
-     * 根据ID查询用户
+     * 查找用户
      */
     User findById(int id);
-
-    /**
-     * 根据用户名查询用户
-     */
-    User findByUsername(String username);
 
     /**
      * 根据用户名和密码查询用户（登录）

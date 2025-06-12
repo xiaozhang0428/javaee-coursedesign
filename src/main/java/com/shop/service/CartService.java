@@ -33,9 +33,4 @@ public interface CartService {
      * 清空购物车
      */
     boolean clearCart(int userId);
-    
-    /**
-     * 计算购物车总金额
-     */
-    double getTotalAmount(int userId);
 }

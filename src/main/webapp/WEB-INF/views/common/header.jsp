@@ -21,8 +21,9 @@
       <!-- 搜索框 -->
       <form class="d-flex me-3" action="${pageContext.request.contextPath}/products" method="get">
         <div class="input-group" style="position: relative;">
-          <input id="search-input" class="form-control" type="search" name="keyword" placeholder="搜索商品..." value="${param.keyword}" autocomplete="off">
-          <button class="btn btn-light" type="submit" id="header-search-btn">
+          <input id="search-input" class="form-control" type="search" name="keyword" placeholder="搜索商品..."
+                 value="${param.keyword}" autocomplete="off">
+          <button id="header-search-btn" class="btn btn-light" type="submit">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -45,7 +46,9 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">
                   <i class="fas fa-user-cog"></i> 个人中心</a></li>
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item" href="${pageContext.request.contextPath}/user/logout">
                   <i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
               </ul>
@@ -69,25 +72,15 @@
   </div>
 </nav>
 
+<script src="${pageContext.request.contextPath}/static/js/SearchSuggestions.js"></script>
+
 <script>
-    // 购物车
-    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
     document.addEventListener('DOMContentLoaded', () => {
         updateCartCount();
-        
-        // 初始化头部搜索框的自动补全功能
-        const headerSearchInput = document.querySelector('#search-input');
-        const headerSearchBtn = document.querySelector('#header-search-btn');
-        
-        if (headerSearchInput && typeof SearchEnhancer !== 'undefined') {
-            new SearchEnhancer({
-                searchInput: headerSearchInput,
-                searchButton: headerSearchBtn,
-                contextPath: '${pageContext.request.contextPath}',
-                debounceDelay: 300,
-                maxSuggestions: 6
-            });
-        }
+
+        const searchInput = document.querySelector('#search-input');
+        const searchBtn = document.querySelector('#header-search-btn');
+        new SearchSuggestions().bind(searchInput, searchBtn);
     });
 
     function updateCartCount(message = undefined) {

@@ -12,17 +12,6 @@
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
   <style>
-    .search-highlight {
-      background-color: #fff3cd;
-      padding: 0 2px;
-      border-radius: 2px;
-      font-weight: 500;
-    }
-    
-    .search-suggestions {
-      font-family: inherit;
-    }
-    
     .hot-search-tags {
       margin-top: 10px;
     }
@@ -133,7 +122,6 @@
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
-<script src="${pageContext.request.contextPath}/static/js/search.js"></script>
 
 <script>
     const searchButton = document.querySelector('#searchBtn');
@@ -141,16 +129,7 @@
     const searchKeyword = document.querySelector('#searchKeyword');
     const hotSearchTags = document.querySelector('#hotSearchTags');
     const hotSearchContainer = document.querySelector('#hotSearchContainer');
-
-    // 初始化搜索增强功能
-    const searchEnhancer = new SearchEnhancer({
-        searchInput: searchKeyword,
-        searchButton: searchButton,
-        contextPath: '${pageContext.request.contextPath}',
-        debounceDelay: 300,
-        maxSuggestions: 8
-    });
-
+    new SearchSuggestions().bind(searchKeyword, searchButton);
     function search() {
         const keyword = searchKeyword.value.trim();
         const sort = sortSelect.value;
@@ -213,10 +192,26 @@
     document.addEventListener('DOMContentLoaded', () => {
         loadHotSearchTags();
         
-        // 如果有搜索关键词，高亮显示搜索结果
-        const currentKeyword = '${param.keyword}';
-        if (currentKeyword) {
-            SearchEnhancer.highlightSearchResults(currentKeyword);
+        // 高亮关键字
+        const keyword = '${param.keyword}';
+        if (keyword) {
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                const nameElement = card.querySelector('.product-name');
+                const descElement = card.querySelector('.product-description');
+
+                if (nameElement) {
+                    const text = nameElement.getAttribute('data-original-text') || nameElement.textContent;
+                    nameElement.setAttribute('data-original-text', text);
+                    nameElement.innerHTML = keyword ? text.replaceAll(keyword, '<mark style="background-color: #fff3cd; padding: 0 2px;">$1</mark>') : text;
+                }
+
+                if (descElement) {
+                    const text = descElement.getAttribute('data-original-text') || descElement.textContent;
+                    descElement.setAttribute('data-original-text', text);
+                    descElement.innerHTML = keyword ? text.replaceAll(keyword, '<mark style="background-color: #fff3cd; padding: 0 2px;">$1</mark>') : text;
+                }
+            });
         }
     });
 </script>
