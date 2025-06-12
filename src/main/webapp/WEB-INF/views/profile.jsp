@@ -10,7 +10,6 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
-  <link href="${pageContext.request.contextPath}/static/css/profile.css" rel="stylesheet">
 </head>
 <body>
 <jsp:include page="common/header.jsp"/>
@@ -25,36 +24,36 @@
       <div class="card profile-card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span><i class="fas fa-user me-2"></i>基本信息</span>
-          <button id="edit" type="button" class="btn btn-edit btn-sm text-white">
+          <button id="edit" type="button" class="btn btn-primary btn-sm">
             <i class="fas fa-edit me-1"></i>编辑
           </button>
         </div>
         <div class="card-body">
           <!-- 显示模式 -->
           <div id="info-display">
-            <div class="info-item">
-              <span class="info-label">用户名：</span>
-              <span class="info-value">${user.username}</span>
+            <div class="p-2">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">用户名：</span>
+              <span class="text-muted">${user.username}</span>
             </div>
-            <div class="info-item">
-              <span class="info-label">注册时间：</span>
-              <span class="info-value"><fmt:formatDate value="${user.createTime}" pattern="yyyy-MM-dd"/></span>
+            <div class="p-2">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">注册时间：</span>
+              <span class="text-muted"><fmt:formatDate value="${user.createTime}" pattern="yyyy-MM-dd"/></span>
             </div>
-            <div class="info-item">
-              <span class="info-label">邮箱：</span>
-              <span class="info-value">${user.email}</span>
+            <div class="p-2">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">邮箱：</span>
+              <span class="text-muted">${user.email}</span>
             </div>
-            <div class="info-item">
-              <span class="info-label">手机号：</span>
-              <span class="info-value">${user.phone}</span>
+            <div class="p-2">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">手机号：</span>
+              <span class="text-muted">${user.phone}</span>
             </div>
-            <div class="info-item">
-              <span class="info-label">地址：</span>
-              <span class="info-value">${user.address}</span>
+            <div class="p-2">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">地址：</span>
+              <span class="text-muted">${user.address}</span>
             </div>
-            <div class="info-item">
-              <span class="info-label">注册时间：</span>
-              <span class="info-value"><fmt:formatDate value="${user.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></span>
+            <div class="p-2 pb-0">
+              <span class="fw-bold text-dark d-inline-block" style="width: 120px">注册时间：</span>
+              <span class="text-muted"><fmt:formatDate value="${user.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></span>
             </div>
           </div>
 
@@ -115,11 +114,11 @@
         const phone = document.querySelector('#phone').value.trim();
         const address = document.querySelector('#address').value.trim();
         const buttons = document.querySelectorAll('.update_control');
-        buttons.forEach(showLoading)
+        const resume = showLoadings(buttons);
         updateProfile(email, phone, address)
             .then(() => showMessage('更新成功', {type: 'success', reload: true}))
             .catch(showError)
-            .finally(() => buttons.forEach(hideLoading))
+            .finally(resume)
     })
 </script>
 </body>

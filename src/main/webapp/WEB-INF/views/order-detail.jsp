@@ -10,25 +10,6 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
-  <style>
-      .section-content {
-          padding: 20px;
-      }
-
-      .product-item {
-          border-bottom: 1px solid #e9ecef;
-          padding: 15px 0;
-      }
-
-      .product-item:last-child {
-          border-bottom: none;
-      }
-
-      .order-actions {
-          position: sticky;
-          top: 20px;
-      }
-  </style>
 </head>
 <body>
 <!-- 导航栏 -->
@@ -97,7 +78,7 @@
         </div>
         <div class="card-body">
           <c:forEach var="item" items="${order.orderItems}">
-            <div class="product-item">
+            <div class="pt-2">
               <div class="row align-items-center">
                 <div class="col-auto">
                   <img src="${pageContext.request.contextPath}/static/images/products/${item.productImage}"
@@ -130,7 +111,7 @@
 
     <div class="col-lg-4">
       <!-- 订单摘要 -->
-      <div class="order-actions">
+      <div class="sticky-top" style="top: 20px">
         <div class="card">
           <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>订单摘要</h5>
@@ -158,33 +139,31 @@
           </div>
         </div>
 
-        <div class="card mt-4">
-          <div class="section-content">
-            <c:choose>
-              <c:when test="${order.status == 'pending'}">
-                <button class="btn btn-primary btn-lg w-100 mb-2"
-                        onclick="updateOrderState(Math.random() >= 0.5 ? 'paid' : 'shipped')">
-                  <i class="fas fa-credit-card me-2"></i>立即支付
-                </button>
-                <button class="btn btn-danger btn-lg w-100 mb-2" onclick="updateOrderState('cancelled')">
-                  <i class="fas fa-x me-2"></i>取消订单
-                </button>
-              </c:when>
-              <c:when test="${order.status == 'paid' || order.status == 'shipped'}">
-                <button class="btn btn-success btn-lg w-100 mb-2" onclick="updateOrderState('completed')">
-                  <i class="fas fa-check me-2"></i>确认收货
-                </button>
-                <button class="btn btn-danger btn-lg w-100 mb-2" onclick="updateOrderState('cancelled')">
-                  <i class="fas fa-x me-2"></i>取消订单
-                </button>
-              </c:when>
-            </c:choose>
+        <div class="card p-4 mt-4">
+          <c:choose>
+            <c:when test="${order.status == 'pending'}">
+              <button class="btn btn-primary btn-lg w-100 mb-2"
+                      onclick="updateOrderState(Math.random() >= 0.5 ? 'paid' : 'shipped')">
+                <i class="fas fa-credit-card me-2"></i>立即支付
+              </button>
+              <button class="btn btn-danger btn-lg w-100 mb-2" onclick="updateOrderState('cancelled')">
+                <i class="fas fa-x me-2"></i>取消订单
+              </button>
+            </c:when>
+            <c:when test="${order.status == 'paid' || order.status == 'shipped'}">
+              <button class="btn btn-success btn-lg w-100 mb-2" onclick="updateOrderState('completed')">
+                <i class="fas fa-check me-2"></i>确认收货
+              </button>
+              <button class="btn btn-danger btn-lg w-100 mb-2" onclick="updateOrderState('cancelled')">
+                <i class="fas fa-x me-2"></i>取消订单
+              </button>
+            </c:when>
+          </c:choose>
 
-            <div class="mt-3">
-              <a href="${pageContext.request.contextPath}/order/orders" class="btn btn-outline-secondary w-100">
-                <i class="fas fa-arrow-left me-2"></i>返回订单列表
-              </a>
-            </div>
+          <div class="mt-3">
+            <a href="${pageContext.request.contextPath}/order/orders" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-arrow-left me-2"></i>返回订单列表
+            </a>
           </div>
         </div>
       </div>

@@ -97,14 +97,14 @@
         const confirmPassword = document.querySelector('#confirmPassword').value;
         const username = document.querySelector('#username').value.trim();
         const email = document.querySelector('#email').value;
-        showLoading(event.target);
+        const resume = showLoading(event.target);
         register(username, password, confirmPassword, email)
             .then(redirect => showMessage('注册成功', {
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
             .catch(showError)
-            .finally(() => hideLoading(event.target));
+            .finally(resume);
     });
 </script>
 </body>

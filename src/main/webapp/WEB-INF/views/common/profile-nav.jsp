@@ -1,8 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<%--<c:set var="selected" value="${not empty param.selected_item ?  param.selected_item : ''}"/>--%>
-
 <div class="col-md-1 position-fixed top-10 mt-4" style="left: 5%">
   <div class="card profile-card">
     <div class="card-header">

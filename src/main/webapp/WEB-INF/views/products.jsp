@@ -58,14 +58,11 @@
 
   <!-- 无商品 -->
   <c:if test="${empty products}">
-    <div class="empty-state">
-      <i class="fas fa-search"></i>
-      <h4>没有找到相关商品</h4>
-      <p>请尝试其他关键词或浏览所有商品</p>
-      <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">
-        <i class="fas fa-list"></i> 浏览所有商品
-      </a>
-    </div>
+    <h4><i class="fas fa-search"></i> 没有找到相关商品</h4>
+    <p>请尝试其他关键词或浏览所有商品</p>
+    <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">
+      <i class="fas fa-list"></i> 浏览所有商品
+    </a>
   </c:if>
 
   <!-- 分页 -->

@@ -21,16 +21,20 @@
         console.error(error);
     }
 
-    function showLoading(element, message = 'loading...') {
-        const originalText = element.textContent;
-        element.setAttribute('data-original-text', originalText);
-        element.innerHTML = `<span class="loading"></span> \${message}`;
+    function showLoading(element, message = 'Loading...') {
+        const originalText = element.innerHTML;
+        const originalDisabled = element.disabled;
         element.disabled = true;
+        element.innerHTML = `<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+\${message}`
+        return () => {
+            element.innerHTML = originalText;
+            element.disabled = originalDisabled;
+        }
     }
 
-    function hideLoading(element) {
-        element.textContent = element.getAttribute('data-original-text');
-        element.disabled = false;
-        element.removeAttribute('data-original-text');
+    function showLoadings(elements, message = 'Loading...') {
+        const resumes = Array.from(elements).map(showLoading(message));
+        return () => resumes.forEach(resume => resume())
     }
 </script>
