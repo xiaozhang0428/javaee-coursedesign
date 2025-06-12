@@ -103,7 +103,7 @@
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
-            .catch(error => showMessage(error.message, 'danger'))
+            .catch(showError)
             .finally(() => hideLoading(event.target));
     });
 </script>

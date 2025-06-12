@@ -6,9 +6,8 @@
 <div class="col-lg-3 col-md-6 mb-4">
   <div class="card h-100 product-card">
     <a class="card-img-top-wrapper" href="${pageContext.request.contextPath}/product?id=${param.id}">
-      <img class="card-img-top" src="${pageContext.request.contextPath}/static/images/products/${empty param.image ? 'default.jpg' : param.image}"
-           alt="${param.name}"
-           onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
+      <img class="card-img-top" alt="${param.name}"
+           src="${pageContext.request.contextPath}/static/images/products/${param.image}">
     </a>
     <div class="card-body d-flex flex-column flex-column-reverse">
       <div class="mt-2 d-grid">
@@ -23,7 +22,7 @@
             <button class="btn btn-primary btn-sm"
                     onclick="addToCart(${param.id})
                         .then(msg => updateCartCount && updateCartCount(msg))
-                        .catch(e => showMessage(e.message, 'danger'))">
+                        .catch(showError)">
               <i class="fas fa-shopping-cart"></i> 添加到购物车
             </button>
           </c:when>

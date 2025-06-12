@@ -11,49 +11,26 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
-  <style>
-    .hot-search-tags {
-      margin-top: 10px;
-    }
-    
-    .hot-search-tags .badge {
-      margin-right: 8px;
-      margin-bottom: 5px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .hot-search-tags .badge:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  </style>
+  <link href="${pageContext.request.contextPath}/static/css/product-card.css" rel="stylesheet">
 </head>
 <body>
-<!-- 导航栏 -->
 <jsp:include page="common/header.jsp"/>
 <jsp:include page="common/toast.jsp"/>
 
 <div class="container mt-4">
-  <!-- 搜索 筛选 -->
-  <div class="row mb-4">
+  <!-- 搜索 -->
+  <form class="row mb-4" id="search-form" action="${pageContext.request.contextPath}/products" method="GET">
     <div class="col-md-10">
-      <div class="input-group">
-        <input type="text" class="form-control" id="searchKeyword"
-               placeholder="搜索商品名称、描述..." value="${param.keyword}"
+      <div id="search-group" class="input-group">
+        <input type="search" class="form-control" name="keyword" placeholder="搜索商品" value="${param.keyword}"
                autocomplete="off">
-        <button class="btn btn-primary" type="button" id="searchBtn">
+        <button class="btn btn-primary" type="submit">
           <i class="fas fa-search"></i> 搜索
         </button>
       </div>
-      <!-- 热门搜索标签 -->
-      <div class="hot-search-tags" id="hotSearchTags" style="display: none;">
-        <small class="text-muted">热门搜索：</small>
-        <div id="hotSearchContainer"></div>
-      </div>
     </div>
     <div class="col-md-2">
-      <select class="form-select" id="sortSelect">
+      <select class="form-select" id="sortSelect" name="sort">
         <option value="default">默认</option>
         <option value="price_asc">价格升序</option>
         <option value="price_desc">价格降序</option>
@@ -61,7 +38,7 @@
         <option value="create_time_desc">最新</option>
       </select>
     </div>
-  </div>
+  </form>
 
   <!-- 商品列表 -->
   <div class="row" id="productList">
@@ -93,12 +70,12 @@
 
   <!-- 分页 -->
   <c:if test="${not empty products}">
-    <nav aria-label="商品分页">
+    <nav>
       <ul class="pagination justify-content-center">
         <c:if test="${currentPage > 1}">
           <li class="page-item">
             <a class="page-link" href="?page=${currentPage - 1}&keyword=${param.keyword}&sort=${param.sort}">
-              <i class="fas fa-chevron-left"></i>
+              <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
         </c:if>
@@ -112,7 +89,7 @@
         <c:if test="${currentPage < totalPages}">
           <li class="page-item">
             <a class="page-link" href="?page=${currentPage + 1}&keyword=${param.keyword}&sort=${param.sort}">
-              <i class="fas fa-chevron-right"></i>
+              <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
         </c:if>
@@ -124,93 +101,26 @@
 <jsp:include page="common/dependency_js.jsp"/>
 
 <script>
-    const searchButton = document.querySelector('#searchBtn');
-    const sortSelect = document.querySelector('#sortSelect');
-    const searchKeyword = document.querySelector('#searchKeyword');
-    const hotSearchTags = document.querySelector('#hotSearchTags');
-    const hotSearchContainer = document.querySelector('#hotSearchContainer');
-    new SearchSuggestions().bind(searchKeyword, searchButton);
-    function search() {
-        const keyword = searchKeyword.value.trim();
-        const sort = sortSelect.value;
-        let url = '${pageContext.request.contextPath}/products';
-
-        // 组装查询参数
-        let params = [];
-        if (keyword)
-            params.push('keyword=' + encodeURIComponent(keyword));
-        if (sort && sort !== 'default')
-            params.push('sort=' + sort);
-        if (params.length > 0)
-            url += '?' + params.join('&');
-
-        window.location.href = url;
+    function highlight(reg, element) {
+        const text = element.getAttribute('data-original-text') || element.textContent;
+        element.setAttribute('data-original-text', text);
+        element.innerHTML = text.replaceAll(reg, '<mark style="background-color: #fff3cd; padding: 0 2px;">$1</mark>');
     }
 
-    // 设置当前排序
-    let currentSort = '${param.sort}';
-    if (currentSort) {
-        sortSelect.value = currentSort;
-    }
-
-    // 绑定事件
-    sortSelect.addEventListener('change', search);
-    searchButton.addEventListener('click', search);
-    searchKeyword.addEventListener('keypress', e => {
-        if (e.key === 'Enter') {
-            search();
-        }
-    });
-
-    // 加载热门搜索标签
-    async function loadHotSearchTags() {
-        try {
-            const response = await fetch('${pageContext.request.contextPath}/api/search/hot-keywords?limit=6');
-            const data = await response.json();
-            
-            if (data.success && data.keywords && data.keywords.length > 0) {
-                hotSearchContainer.innerHTML = '';
-                data.keywords.forEach(keyword => {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge bg-light text-dark';
-                    badge.textContent = keyword;
-                    badge.style.cursor = 'pointer';
-                    badge.addEventListener('click', () => {
-                        searchKeyword.value = keyword;
-                        search();
-                    });
-                    hotSearchContainer.appendChild(badge);
-                });
-                hotSearchTags.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('加载热门搜索失败:', error);
-        }
-    }
-
-    // 页面加载完成后执行
     document.addEventListener('DOMContentLoaded', () => {
-        loadHotSearchTags();
-        
+        new SearchSuggestions().bind(document.querySelector('#search-group'));
+
+        const sortSelect = document.querySelector('#sortSelect');
+        sortSelect.value = '${param.sort}' || 'default';
+        sortSelect.addEventListener('change', () => document.querySelector('#search-form').submit());
+
         // 高亮关键字
         const keyword = '${param.keyword}';
         if (keyword) {
-            const productCards = document.querySelectorAll('.product-card');
-            productCards.forEach(card => {
-                const nameElement = card.querySelector('.product-name');
-                const descElement = card.querySelector('.product-description');
-
-                if (nameElement) {
-                    const text = nameElement.getAttribute('data-original-text') || nameElement.textContent;
-                    nameElement.setAttribute('data-original-text', text);
-                    nameElement.innerHTML = keyword ? text.replaceAll(keyword, '<mark style="background-color: #fff3cd; padding: 0 2px;">$1</mark>') : text;
-                }
-
-                if (descElement) {
-                    const text = descElement.getAttribute('data-original-text') || descElement.textContent;
-                    descElement.setAttribute('data-original-text', text);
-                    descElement.innerHTML = keyword ? text.replaceAll(keyword, '<mark style="background-color: #fff3cd; padding: 0 2px;">$1</mark>') : text;
-                }
+            const reg = new RegExp(`(\${keyword})`, 'ig');
+            document.querySelectorAll('.product-card').forEach(card => {
+                highlight(reg, card.querySelector('.product-name'));
+                highlight(reg, card.querySelector('.product-description'));
             });
         }
     });

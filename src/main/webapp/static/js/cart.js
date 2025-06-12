@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }));
 
-    // 更新购物车数量
+    // 修改购物车商品数量
     function updateProductCount(cartId, quantity) {
         const buttons = document.querySelectorAll(`.quantity-btn[data-cart-id="${cartId}"]`)
         const input = document.querySelector(`.quantity-input[data-cart-id="${cartId}"]`);
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateTotal();
                 updateCartCount();
             })
-            .catch(e => showMessage(e.message, 'danger'))
+            .catch(showError)
             .finally(() => {
                 buttons.forEach(btn => btn.disabled = false);
                 input.disabled = false;
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateCartCount();
                     location.reload();
                 })
-                .catch(error => showMessage(error.message, 'danger'));
+                .catch(showError);
         }
     }));
 
@@ -105,13 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     deletedItems
                         .map(id => document.querySelector(`.cart-item[data-cart-id="${id}"]`))
                         .forEach(el => el.parentNode.removeChild(el));
-
                     updateTotal();
                     updateSelectAll();
                     updateCartCount();
                     showMessage('商品已删除', {type: 'success', reload: true});
                 })
-                .catch(e => showMessage(e.message, 'danger'))
+                .catch(showError)
         }
     });
 
@@ -122,15 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('请选择要结算的商品', 'danger');
             return;
         }
-        
-        // 跳转到结算页面
+
         const productIds = Array.from(selectedItems).map(el => el.value);
         const params = new URLSearchParams();
         productIds.forEach(id => params.append('productIds', id));
-        
-        // 使用动态上下文路径
-        const contextPath = window.APP_CONTEXT_PATH || '';
-        window.location.href = contextPath + '/order/checkout?' + params.toString();
+        window.location.href = window.APP_CONTEXT_PATH + '/order/checkout?' + params.toString();
     })
-
 })

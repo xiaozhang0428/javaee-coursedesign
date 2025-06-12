@@ -71,7 +71,7 @@
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}' + redirect
             }))
-            .catch(error => showMessage(error.message, {type: 'danger'}))
+            .catch(showError)
     });
 </script>
 </body>

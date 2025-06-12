@@ -16,6 +16,11 @@
         }
     }
 
+    function showError(error, options = 'danger') {
+        showMessage(error.message, options);
+        console.error(error);
+    }
+
     function showLoading(element, message = 'loading...') {
         const originalText = element.textContent;
         element.setAttribute('data-original-text', originalText);

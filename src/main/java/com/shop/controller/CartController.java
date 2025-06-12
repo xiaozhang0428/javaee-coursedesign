@@ -1,11 +1,8 @@
 package com.shop.controller;
 
 import com.shop.entity.Cart;
-import com.shop.entity.Order;
 import com.shop.entity.User;
 import com.shop.service.CartService;
-import com.shop.service.OrderService;
-import com.shop.util.Either;
 import com.shop.util.JsonResult;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +22,6 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
-
-    @Autowired
-    private OrderService orderService;
 
     /**
      * 购物车页面
@@ -165,49 +159,5 @@ public class CartController {
             return JsonResult.error("部分商品删除失败", deletedProducts);
         }
         return JsonResult.success("删除成功", deletedProducts);
-    }
-
-    /**
-     * 获取选中的购物车商品
-     */
-    @PostMapping("/getSelectedItems")
-    @ResponseBody
-    public JsonResult<List<Cart>> getSelectedItems(@RequestParam("productIds") List<Integer> productIds,
-                                                   HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return JsonResult.error("请先登录");
-        }
-
-        if (productIds.isEmpty()) {
-            return JsonResult.error("请选择商品");
-        }
-
-        List<Cart> cartItems = cartService.findByUserId(user.getId());
-        List<Cart> selectedItems = cartItems.stream()
-                .filter(item -> productIds.contains(item.getProductId()))
-                .toList();
-
-        return JsonResult.success(selectedItems);
-    }
-
-    /**
-     * 结算购物车商品
-     */
-    @PostMapping("/checkout")
-    @ResponseBody
-    public JsonResult<Order> checkout(@RequestBody List<Integer> productIds,
-                                       HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return JsonResult.error("请先登录");
-        }
-
-        if (productIds.isEmpty()) {
-            return JsonResult.error("请选择要结算的商品");
-        }
-
-        Either<Order> order = orderService.createOrder(user, productIds);
-        return JsonResult.from(order);
     }
 }

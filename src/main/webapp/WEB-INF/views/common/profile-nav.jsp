@@ -72,6 +72,6 @@
                 type: 'success',
                 redirect: '${pageContext.request.contextPath}/user/login'
             }))
-            .catch(e => showMessage(e.message, 'danger'));
+            .catch(showError);
     });
 </script>

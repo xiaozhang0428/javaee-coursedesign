@@ -27,16 +27,14 @@ public interface OrderMapper {
     List<Order> findByUserId(int userId);
 
     /**
+     * 根据用户ID查询订单列表
+     */
+    List<Order> findByUserIdAndStatus(@Param("userId") int userId, @Param("status") String status);
+
+    /**
      * 根据状态查询订单
      */
     List<Order> findByStatus(int status);
-
-    /**
-     * 根据用户ID和日期范围查询订单
-     */
-    List<Order> findByUserIdAndDateRange(@Param("userId") int userId,
-                                         @Param("startDate") Date startDate,
-                                         @Param("endDate") Date endDate);
 
     /**
      * 分页查询订单
@@ -66,7 +64,7 @@ public interface OrderMapper {
     /**
      * 更新订单状态
      */
-    int updateStatus(@Param("id") int id, @Param("status") int status);
+    int updateStatus(@Param("id") int id, @Param("status") String status);
 
     /**
      * 删除订单

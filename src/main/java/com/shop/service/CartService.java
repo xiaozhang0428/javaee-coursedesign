@@ -28,9 +28,4 @@ public interface CartService {
      * 从购物车删除商品
      */
     boolean removeFromCart(int userId, int productId);
-    
-    /**
-     * 清空购物车
-     */
-    boolean clearCart(int userId);
 }

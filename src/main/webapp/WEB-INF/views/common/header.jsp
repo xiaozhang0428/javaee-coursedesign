@@ -20,10 +20,9 @@
 
       <!-- 搜索框 -->
       <form class="d-flex me-3" action="${pageContext.request.contextPath}/products" method="get">
-        <div class="input-group" style="position: relative;">
-          <input id="search-input" class="form-control" type="search" name="keyword" placeholder="搜索商品..."
-                 value="${param.keyword}" autocomplete="off">
-          <button id="header-search-btn" class="btn btn-light" type="submit">
+        <div id="header-search" class="input-group" style="position: relative;">
+          <input class="form-control" type="search" name="keyword" placeholder="搜索商品..." value="${param.keyword}" autocomplete="off">
+          <button class="btn btn-light" type="submit">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -72,15 +71,36 @@
   </div>
 </nav>
 
-<script src="${pageContext.request.contextPath}/static/js/SearchSuggestions.js"></script>
+<style>
+    .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        z-index: 1000;
+    }
+
+    .suggestion-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         updateCartCount();
-
-        const searchInput = document.querySelector('#search-input');
-        const searchBtn = document.querySelector('#header-search-btn');
-        new SearchSuggestions().bind(searchInput, searchBtn);
+        new SearchSuggestions().bind(document.querySelector('#header-search'));
     });
 
     function updateCartCount(message = undefined) {
@@ -90,5 +110,66 @@
             showMessage(message, 'success')
         }
         </c:if>
+    }
+
+    class SearchSuggestions {
+        constructor() {
+            this.suggestionCount = 6;
+            this.timer = null;
+            this.suggestionContainer = document.createElement('div');
+            this.suggestionContainer.className = 'search-suggestions';
+        }
+
+        bind(inputGroup) {
+            this.searchButton = inputGroup.querySelector('button');
+            this.searchInput = inputGroup.querySelector('input');
+            this.searchInput.addEventListener('blur', () => this.hideSuggestions());
+            this.searchInput.addEventListener('focus', () => this.handleInput());
+            this.searchInput.addEventListener('input', () => this.handleInput());
+            inputGroup.appendChild(this.suggestionContainer);
+        }
+
+        handleInput() {
+            const keyword = (this.searchInput.value || "").trim();
+            if (keyword.length === 0) return;
+
+            if (this.timer) window.clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                if (keyword.length >= 1) {
+                    getSuggestions(keyword, this.suggestionCount)
+                        .then(suggestions => this.showSuggestions(suggestions))
+                        .catch(showError);
+                } else {
+                    this.hideSuggestions();
+                }
+            }, 300);
+        }
+
+        showSuggestions(suggestions) {
+            if (!suggestions || suggestions.length === 0) {
+                this.hideSuggestions();
+            } else {
+                this.suggestionContainer.innerHTML = '';
+                this.suggestionContainer.style.display = 'block';
+
+                for (let suggestion of suggestions) {
+                    const item = document.createElement('div');
+
+                    item.className = 'suggestion-item';
+                    item.textContent = suggestion;
+                    item.addEventListener('click', () => {
+                        this.hideSuggestions();
+                        this.searchInput.value = suggestion;
+                        this.searchButton.click();
+                    });
+
+                    this.suggestionContainer.appendChild(item)
+                }
+            }
+        }
+
+        hideSuggestions() {
+            this.suggestionContainer.style.display = 'none';
+        }
     }
 </script>

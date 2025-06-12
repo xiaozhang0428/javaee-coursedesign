@@ -15,7 +15,7 @@
 <body>
 <jsp:include page="common/header.jsp"/>
 <jsp:include page="common/toast.jsp"/>
-<jsp:include page="common/profile_nav.jsp">
+<jsp:include page="common/profile-nav.jsp">
   <jsp:param name="selected_item" value="0"/>
 </jsp:include>
 
@@ -118,7 +118,7 @@
         buttons.forEach(showLoading)
         updateProfile(email, phone, address)
             .then(() => showMessage('更新成功', {type: 'success', reload: true}))
-            .catch(error => showMessage(error.message, 'danger'))
+            .catch(showError)
             .finally(() => buttons.forEach(hideLoading))
     })
 </script>

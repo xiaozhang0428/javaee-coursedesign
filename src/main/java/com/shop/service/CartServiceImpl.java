@@ -1,14 +1,12 @@
-package com.shop.service.impl;
+package com.shop.service;
 
 import com.shop.entity.Cart;
 import com.shop.entity.Product;
 import com.shop.mapper.CartMapper;
 import com.shop.mapper.ProductMapper;
-import com.shop.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,7 +33,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Product product = productMapper.findById(productId);
-        if (product == null || product.getStatus() != 1 || product.getStock() < quantity) {
+        if (product == null || product.getStock() < quantity) {
             return "库存不足";
         }
 
@@ -80,8 +78,4 @@ public class CartServiceImpl implements CartService {
         return cartMapper.deleteByUserIdAndProductId(userId, productId) > 0;
     }
 
-    @Override
-    public boolean clearCart(int userId) {
-        return cartMapper.deleteByUserId(userId) > 0;
-    }
 }

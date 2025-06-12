@@ -17,8 +17,5 @@ public class Product {
     private int stock;
     private int sales;
     private String image;
-    private int status;
-    // 注释掉数据库中不存在的字段
-    // private int categoryId;
-    // private Date createTime;
+    private Date createTime;
 }

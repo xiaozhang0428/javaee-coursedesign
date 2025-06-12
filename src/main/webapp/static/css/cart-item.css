@@ -1,0 +1,18 @@
+.cart-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.quantity-input {
+    width: 80px;
+    text-align: center;
+}
+
+.price {
+    font-weight: bold;
+    color: #dc3545;
+}

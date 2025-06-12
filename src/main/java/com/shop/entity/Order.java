@@ -11,34 +11,34 @@ import java.util.List;
  */
 @Data
 public class Order {
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_PAID = "paid";
+    public static final String STATUS_SHIPPED = "shipped";
+    public static final String STATUS_COMPLETED = "completed";
+    public static final String STATUS_CANCELLED = "cancelled";
+
     private int id;
     private int userId;
     private BigDecimal totalAmount;
-    private int status; // 0-待支付，1-已支付，2-已发货，3-已完成
-    private String shippingAddress;
+    // pending, paid, shipped, completed, cancelled
+    // 待付款    已付款 已发货    已完成      已取消
+    private String status;
+    private String username;
+    private String phone;
+    private String address;
     private Date createTime;
 
-    private User user;
     private List<OrderItem> orderItems;
 
-    public Order() {
-    }
-
-    public Order(int userId, BigDecimal totalAmount, int status, String shippingAddress, Date createTime) {
-        this.userId = userId;
-        this.totalAmount = totalAmount;
-        this.status = status;
-        this.shippingAddress = shippingAddress;
-        this.createTime = createTime;
-    }
-
-    public String getStatusText() {
-        return switch (status) {
-            case 0 -> "待支付";
-            case 1 -> "已支付";
-            case 2 -> "已发货";
-            case 3 -> "已完成";
-            default -> "未知状态";
-        };
+    public static Order forCreate(User user, BigDecimal totalAmount) {
+        Order order = new Order();
+        order.userId = user.getId();
+        order.totalAmount = totalAmount;
+        order.status = STATUS_PENDING;
+        order.username = user.getUsername();
+        order.phone = user.getPhone();
+        order.address = user.getAddress();
+        order.createTime = new Date();
+        return order;
     }
 }

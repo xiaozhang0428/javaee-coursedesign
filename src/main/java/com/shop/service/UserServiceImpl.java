@@ -1,8 +1,7 @@
-package com.shop.service.impl;
+package com.shop.service;
 
 import com.shop.mapper.UserMapper;
 import com.shop.entity.User;
-import com.shop.service.UserService;
 import com.shop.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

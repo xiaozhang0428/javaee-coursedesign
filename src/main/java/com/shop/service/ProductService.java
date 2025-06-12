@@ -8,24 +8,14 @@ import java.util.List;
  * 商品服务接口
  */
 public interface ProductService {
-    
-    /**
-     * 查询所有商品
-     */
-    List<Product> findAll();
-    
+
     /**
      * 根据ID查询商品
      */
     Product findById(Integer id);
-    
+
     /**
      * 搜索商品
-     */
-    List<Product> searchProducts(String keyword);
-    
-    /**
-     * 搜索商品（带排序）
      */
     List<Product> searchProducts(String keyword, String sort);
     
@@ -38,14 +28,9 @@ public interface ProductService {
      * 查询最新商品
      */
     List<Product> findLatestProducts(int limit);
-    
+
     /**
      * 分页查询商品
-     */
-    List<Product> findByPage(int page, int size);
-    
-    /**
-     * 分页查询商品（带排序）
      */
     List<Product> findByPage(int page, int size, String sort);
     
@@ -53,34 +38,14 @@ public interface ProductService {
      * 统计商品总数
      */
     int getTotalCount();
-    
-    /**
-     * 添加商品
-     */
-    boolean addProduct(Product product);
-    
+
     /**
      * 更新商品
      */
     boolean updateProduct(Product product);
-    
+
     /**
-     * 删除商品
+     * 自动补全
      */
-    boolean deleteProduct(Integer id);
-    
-    /**
-     * 获取搜索建议（自动补全）
-     */
-    List<String> getSearchSuggestions(String keyword, int limit);
-    
-    /**
-     * 获取热门搜索关键词
-     */
-    List<String> getHotSearchKeywords(int limit);
-    
-    /**
-     * 统计搜索结果数量
-     */
-    int countSearchResults(String keyword);
+    List<String> getSuggestions(String keyword, int limit);
 }

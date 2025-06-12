@@ -24,6 +24,7 @@
             }
         }
 
+        // 默认值
         options.type ||= 'primary';
         options.duration ||= 5000;
         options.redirectDelay ||= 1000;

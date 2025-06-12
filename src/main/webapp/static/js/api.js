@@ -92,7 +92,7 @@ async function register(username, password, confirmPassword, email, redirect = '
     if (password !== confirmPassword) {
         throw new Error("两次密码不一致");
     }
-     if (!email.includes('@')) {
+    if (!email.includes('@')) {
         throw new Error('请输入正确的邮箱格式')
     }
 
@@ -196,19 +196,26 @@ async function removeCartItems(productIds) {
     return result.data;
 }
 
-/**
- * 结算
- *
- * @param productIds 选中的商品 id
- * @returns {Promise<string>}
- */
-async function checkoutCart(productIds) {
-    if (!productIds || productIds.length === 0) {
-        throw new Error('请选择要结算的商品');
-    }
+// order
 
-    const result = await post('/cart/checkout', productIds);
-    return result.message;
+/**
+ * 创建订单
+ * @param productIds {number[] | string[]}
+ * @returns {Promise<Order>}
+ */
+async function createOrder(productIds) {
+    const result = await post('/order/create', productIds);
+    return result.data;
+}
+
+/**
+ * 更新订单状态
+ * @param id {number}
+ * @param status { 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled' }
+ * @returns {Promise<JsonResult<void>>}
+ */
+async function updateStatus(id, status) {
+    return await post('/order/status', {id, status});
 }
 
 // search
@@ -221,8 +228,7 @@ async function checkoutCart(productIds) {
  * @returns {Promise<string[]>}
  */
 async function getSuggestions(keyword, limit) {
-    if (keyword.length === 0) return [];
-
+    if (keyword.length === 0) throw Error("请输入搜索关键词");
     const result = await get("/search/suggestions", {keyword, limit});
     return result.data;
 }

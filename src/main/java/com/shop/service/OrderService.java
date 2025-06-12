@@ -10,12 +10,17 @@ import java.util.List;
  * 订单服务接口
  */
 public interface OrderService {
-    
+
     /**
      * 根据用户ID查询订单列表
      */
     List<Order> findByUserId(int userId);
-    
+
+    /**
+     * 根据用户ID和订单状态查询订单列表
+     */
+    List<Order> findByUserIdAndStatus(int userId, String status);
+
     /**
      * 根据ID查询订单详情
      */
@@ -29,25 +34,6 @@ public interface OrderService {
     /**
      * 更新订单状态
      */
-    boolean updateStatus(int orderId, int status);
-    
-    /**
-     * 分页查询订单
-     */
-    List<Order> findByPage(int page, int size);
-    
-    /**
-     * 统计订单总数
-     */
-    int countAll();
-    
-    /**
-     * 根据用户ID统计订单数
-     */
-    int countByUserId(int userId);
-    
-    /**
-     * 再次购买（将订单中的商品添加到购物车）
-     */
-    Either<String> buyAgain(int userId, int orderId);
+    boolean updateStatus(int orderId, String status);
+
 }

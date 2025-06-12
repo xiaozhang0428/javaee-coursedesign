@@ -4,58 +4,29 @@
 
 <mapper namespace="com.shop.mapper.OrderItemMapper">
 
-    <!-- 结果映射 -->
-    <resultMap id="OrderItemResultMap" type="OrderItem">
-        <id property="id" column="id"/>
-        <result property="orderId" column="order_id"/>
-        <result property="productId" column="product_id"/>
-        <result property="quantity" column="quantity"/>
-        <result property="productName" column="product_name"/>
-        <result property="productPrice" column="product_price"/>
-        <result property="subtotal" column="subtotal"/>
-        <result property="price" column="price"/>
-        
-        <!-- 关联商品信息 -->
-        <association property="product" javaType="Product">
-            <id property="id" column="product_id"/>
-            <result property="name" column="p_name"/>
-            <result property="description" column="p_description"/>
-            <result property="price" column="p_price"/>
-            <result property="stock" column="p_stock"/>
-            <result property="sales" column="p_sales"/>
-            <result property="status" column="p_status"/>
-        </association>
-    </resultMap>
-
     <!-- 根据订单ID查询订单明细 -->
-    <select id="findByOrderId" parameterType="int" resultMap="OrderItemResultMap">
-        SELECT oi.*, 
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.stock as p_stock, p.sales as p_sales, p.status as p_status
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        WHERE oi.order_id = #{orderId}
-        ORDER BY oi.id
+    <select id="findByOrderId" parameterType="int" resultType="com.shop.entity.OrderItem">
+        SELECT * from order_items where oid = #{orderId};
     </select>
 
     <!-- 添加订单明细 -->
-    <insert id="insert" parameterType="OrderItem" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO order_items (order_id, product_id, quantity, product_name, product_price, subtotal, price)
-        VALUES (#{orderId}, #{productId}, #{quantity}, #{productName}, #{productPrice}, #{subtotal}, #{price})
+    <insert id="insert" parameterType="com.shop.entity.OrderItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO order_items (oid, pid, price, quantity, subtotal, product_name, product_description, product_price, product_image)
+        VALUES (#{oid}, #{pid}, #{price}, #{quantity}, #{subtotal}, #{productName}, #{productDescription}, #{productPrice}, #{productImage});
     </insert>
 
     <!-- 批量添加订单明细 -->
     <insert id="batchInsert" parameterType="list">
-        INSERT INTO order_items (order_id, product_id, quantity, product_name, product_price, subtotal, price)
+        INSERT INTO order_items (oid, pid, price, quantity, subtotal, product_name, product_description, product_price, product_image)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.orderId}, #{item.productId}, #{item.quantity}, #{item.productName}, #{item.productPrice}, #{item.subtotal}, #{item.price})
+            (#{item.oid}, #{item.pid}, #{item.price}, #{item.quantity}, #{item.subtotal}, #{item.productName}, #{item.productDescription}, #{item.productPrice}, #{item.productImage})
         </foreach>
     </insert>
 
     <!-- 删除订单明细 -->
     <delete id="deleteByOrderId" parameterType="int">
-        DELETE FROM order_items WHERE order_id = #{orderId}
+        DELETE FROM order_items WHERE oid = #{orderId};
     </delete>
 
 </mapper>

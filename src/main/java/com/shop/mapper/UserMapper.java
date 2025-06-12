@@ -29,11 +29,6 @@ public interface UserMapper {
     int update(User user);
 
     /**
-     * 删除用户
-     */
-    int deleteById(int id);
-
-    /**
      * 检查用户名是否存在
      */
     int countByUsername(String username);

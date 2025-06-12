@@ -11,12 +11,13 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/static/css/cart-item.css" rel="stylesheet">
 </head>
 <body>
 <!-- 导航栏 -->
 <jsp:include page="common/header.jsp"/>
 <jsp:include page="common/toast.jsp"/>
-<jsp:include page="common/profile_nav.jsp">
+<jsp:include page="common/profile-nav.jsp">
   <jsp:param name="selected_item" value="2"/>
 </jsp:include>
 
@@ -39,64 +40,14 @@
         </div>
         <div class="card-body p-0">
           <c:forEach var="item" items="${cartItems}">
-            <div class="cart-item" data-cart-id="${item.productId}">
-              <div class="row align-items-center p-3">
-                <div class="col-auto">
-                  <div class="form-check">
-                    <input class="form-check-input item-checkbox" type="checkbox"
-                           value="${item.productId}" data-price="${item.product.price}">
-                  </div>
-                </div>
-                <div class="col-auto">
-                  <img src="${pageContext.request.contextPath}/static/images/products/${empty item.product.image ? 'default.jpg' : item.product.image}"
-                       class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;"
-                       alt="${item.product.name}"
-                       onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
-                </div>
-                <div class="col">
-                  <h6 class="mb-1">${item.product.name}</h6>
-                  <p class="text-muted small mb-0">
-                    <c:choose>
-                      <c:when test="${fn:length(item.product.description) > 60}">
-                        ${fn:substring(item.product.description, 0, 60)}...
-                      </c:when>
-                      <c:otherwise>
-                        ${item.product.description}
-                      </c:otherwise>
-                    </c:choose>
-                  </p>
-                </div>
-                <div class="col-auto">
-                      <span class="price h6">
-                          <fmt:formatNumber value="${item.product.price}" pattern="¥#,##0.00"/>
-                      </span>
-                </div>
-                <div class="col-auto">
-                  <div class="input-group" style="width: 120px;">
-                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
-                            type="button" data-delta="-1" data-cart-id="${item.productId}">
-                      <i class="fas fa-minus"></i>
-                    </button>
-                    <input type="number" class="form-control form-control-sm text-center quantity-input"
-                           value="${item.quantity}" data-original-value="${item.quantity}" data-cart-id="${item.productId}">
-                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
-                            type="button" data-delta="1" data-cart-id="${item.productId}">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="col-auto">
-                      <span class="subtotal h6 text-danger">
-                          <fmt:formatNumber value="${item.product.price * item.quantity}" pattern="¥#,##0.00"/>
-                      </span>
-                </div>
-                <div class="col-auto">
-                  <button class="btn btn-outline-danger btn-sm delete-item" data-cart-id="${item.productId}">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <jsp:include page="common/cart-item.jsp">
+              <jsp:param name="productId" value="${item.productId}"/>
+              <jsp:param name="price" value="${item.product.price}"/>
+              <jsp:param name="image" value="${item.product.image}"/>
+              <jsp:param name="name" value="${item.product.name}"/>
+              <jsp:param name="description" value="${item.product.description}"/>
+              <jsp:param name="quantity" value="${item.quantity}"/>
+            </jsp:include>
           </c:forEach>
         </div>
       </div>
@@ -137,10 +88,6 @@
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
-<script>
-    // 设置应用上下文路径
-    window.APP_CONTEXT_PATH = '${pageContext.request.contextPath}';
-</script>
 <script src="${pageContext.request.contextPath}/static/js/cart.js"></script>
 </body>
 </html>

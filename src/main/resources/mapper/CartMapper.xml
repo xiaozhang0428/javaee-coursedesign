@@ -4,39 +4,42 @@
 
 <mapper namespace="com.shop.mapper.CartMapper">
     
-    <resultMap id="CartResultMap" type="com.shop.entity.Cart">
+    <resultMap id="CartResultMap" type="Cart">
+        <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="productId" column="product_id"/>
         <result property="quantity" column="quantity"/>
-        <association property="product" javaType="com.shop.entity.Product">
+        <result property="createTime" column="create_time"/>
+        <association property="product" javaType="Product">
             <id property="id" column="p_id"/>
-            <result property="name" column="p_name"/>
-            <result property="description" column="p_description"/>
-            <result property="price" column="p_price"/>
-            <result property="stock" column="p_stock"/>
-            <result property="sales" column="p_sales"/>
-            <result property="image" column="p_image"/>
-            <result property="status" column="p_status"/>
+            <result property="name" column="name"/>
+            <result property="description" column="description"/>
+            <result property="price" column="price"/>
+            <result property="stock" column="stock"/>
+            <result property="sales" column="sales"/>
+            <result property="image" column="image"/>
         </association>
     </resultMap>
 
     <select id="findByUserId" parameterType="int" resultMap="CartResultMap">
-        SELECT c.user_id, c.product_id, c.quantity,
-               p.id as p_id, p.name as p_name, p.description as p_description, 
-               p.price as p_price, p.stock as p_stock, p.sales as p_sales, 
-               p.image as p_image, p.status as p_status
+        SELECT c.id, c.user_id, c.product_id, c.quantity, c.create_time,
+               p.id as p_id, p.name, p.description, p.price, p.stock, p.sales, p.image
         FROM carts c 
         LEFT JOIN products p ON c.product_id = p.id
-        WHERE c.user_id = #{userId} AND p.status = 1
+        WHERE c.user_id = #{userId}
     </select>
 
     <select id="findByUserIdAndProductId" resultType="com.shop.entity.Cart">
-        SELECT * FROM carts WHERE user_id = #{userId} AND product_id = #{productId}
+        SELECT c.id, c.user_id, c.product_id, c.quantity, c.create_time,
+               p.id as p_id, p.name, p.description, p.price, p.stock, p.sales, p.image
+        FROM carts c
+        LEFT JOIN products p ON c.product_id = p.id
+        WHERE user_id = #{userId} AND product_id = #{productId}
     </select>
 
     <insert id="insert" parameterType="com.shop.entity.Cart">
-        INSERT INTO carts (user_id, product_id, quantity)
-        VALUES (#{userId}, #{productId}, #{quantity})
+        INSERT INTO carts (user_id, product_id, quantity, create_time)
+        VALUES (#{userId}, #{productId}, #{quantity}, #{createTime})
         ON DUPLICATE KEY UPDATE quantity = quantity + #{quantity}
     </insert>
 
@@ -47,10 +50,6 @@
 
     <delete id="deleteByUserIdAndProductId">
         DELETE FROM carts WHERE user_id = #{userId} AND product_id = #{productId}
-    </delete>
-
-    <delete id="deleteByUserId" parameterType="int">
-        DELETE FROM carts WHERE user_id = #{userId}
     </delete>
 
 </mapper>

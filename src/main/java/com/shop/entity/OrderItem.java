@@ -10,42 +10,29 @@ import java.math.BigDecimal;
 @Data
 public class OrderItem {
     private int id;
-    private int orderId;
-    private int productId;
+    private int oid;
+    private int pid;
+    private BigDecimal price;
     private int quantity;
-    private String productName;  // 商品名称
-    private BigDecimal productPrice;  // 商品价格
-    private BigDecimal subtotal;  // 小计
-    private BigDecimal price;  // 商品单价（可选字段）
+    private BigDecimal subtotal; // 小计
 
-    private Product product;
+    private String productName;
+    private String productDescription;
+    private BigDecimal productPrice;
+    private String productImage;
 
-    public static OrderItem forCreate(int orderId, int productId, int quantity, BigDecimal price, Product product) {
+    public static OrderItem forCreate(Order order, Product product, int quantity, BigDecimal price) {
         OrderItem orderItem = new OrderItem();
-        orderItem.orderId = orderId;
-        orderItem.productId = productId;
+        orderItem.oid = order.getId();
+        orderItem.pid = product.getId();
+        orderItem.price = price;
         orderItem.quantity = quantity;
-        orderItem.productName = product != null ? product.getName() : ""; // 设置商品名称
-        orderItem.productPrice = product != null ? product.getPrice() : BigDecimal.ZERO; // 设置商品价格
-        orderItem.subtotal = orderItem.productPrice.multiply(BigDecimal.valueOf(quantity)); // 计算小计
-        orderItem.price = orderItem.productPrice; // 设置单价（与productPrice相同）
-        orderItem.product = product;
+        orderItem.subtotal = price.multiply(BigDecimal.valueOf(quantity));
+
+        orderItem.productName = product.getName();
+        orderItem.productDescription = product.getDescription();
+        orderItem.productPrice = product.getPrice();
+        orderItem.productImage = product.getImage();
         return orderItem;
-    }
-    
-    // 获取商品价格（优先使用productPrice字段，如果为空则从Product对象获取）
-    public BigDecimal getPrice() {
-        if (productPrice != null) {
-            return productPrice;
-        }
-        return product != null ? product.getPrice() : BigDecimal.ZERO;
-    }
-    
-    // 计算总价（优先使用subtotal字段，如果为空则计算）
-    public BigDecimal getTotalPrice() {
-        if (subtotal != null) {
-            return subtotal;
-        }
-        return getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }

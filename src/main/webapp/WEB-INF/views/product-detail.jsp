@@ -11,6 +11,7 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/static/css/product-card.css" rel="stylesheet">
 </head>
 <body>
 <jsp:include page="common/header.jsp"/>
@@ -18,7 +19,6 @@
 
 <!-- 商品详情 -->
 <div class="container mt-4">
-  <!-- 面包屑导航 -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">首页</a></li>
@@ -28,14 +28,10 @@
   </nav>
 
   <div class="row">
-    <!-- 商品图片 -->
     <div class="col-md-6 product-image-container">
-      <img src="${pageContext.request.contextPath}/static/images/products/${empty product.image ? 'default.jpg' : product.image}"
-           class="img-fluid rounded" alt="${product.name}"
-           onerror="this.src='${pageContext.request.contextPath}/static/images/products/default.jpg'">
+      <img src="${pageContext.request.contextPath}/static/images/products/${product.image}" class="img-fluid rounded">
     </div>
 
-    <!-- 商品信息 -->
     <div class="col-md-6">
       <div class="product-info">
         <h1 class="product-title">${product.name}</h1>
@@ -53,14 +49,14 @@
 
         <p class="text-muted product-description mb-4">${product.description}</p>
 
-        <!-- 购买选项 -->
-        <div class="purchase-options">
+        <div class="purchase-options mt-5">
           <div class="row align-items-center mb-3">
             <label for="quantity" class="col-3 form-label">数量:</label>
             <div class="col-4">
               <div class="input-group">
                 <button class="btn btn-outline-secondary" type="button" onclick="decreaseQuantity()">-</button>
-                <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="${product.stock}">
+                <input type="number" class="form-control text-center" id="quantity" value="1" min="1"
+                       max="${product.stock}">
                 <button class="btn btn-outline-secondary" type="button" onclick="increaseQuantity()">+</button>
               </div>
             </div>
@@ -87,29 +83,6 @@
       </div>
     </div>
   </div>
-
-  <!-- 相关商品推荐 -->
-  <c:if test="${not empty relatedProducts}">
-    <div class="row mt-5">
-      <div class="col-12">
-        <h3 class="mb-4">相关商品推荐</h3>
-        <div class="row">
-          <c:forEach var="relatedProduct" items="${relatedProducts}">
-            <jsp:include page="common/product-card.jsp">
-              <jsp:param name="id" value="${product.id}"/>
-              <jsp:param name="name" value="${product.name}"/>
-              <jsp:param name="description" value="${product.description}"/>
-              <jsp:param name="price" value="${product.price}"/>
-              <jsp:param name="sales" value="${product.sales}"/>
-              <jsp:param name="stock" value="${product.stock}"/>
-              <jsp:param name="image" value="${product.image}"/>
-              <jsp:param name="showSales" value="true"/>
-            </jsp:include>
-          </c:forEach>
-        </div>
-      </div>
-    </div>
-  </c:if>
 </div>
 
 <jsp:include page="common/dependency_js.jsp"/>
@@ -132,7 +105,7 @@
         <c:when test="${sessionScope.user != null}">
         addToCart(${product.id}, document.querySelector('#quantity').value)
             .then(message => showMessage(message, {type: 'success', redirect}))
-            .catch(error => console.error(error.message));
+            .catch(showError);
         </c:when>
         <c:otherwise>
         showMessage('请先登录', {type: 'warning', redirect: '${pageContext.request.contextPath}/user/login'});

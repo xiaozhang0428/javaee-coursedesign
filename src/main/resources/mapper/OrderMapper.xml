@@ -10,104 +10,60 @@
         <result property="userId" column="user_id"/>
         <result property="totalAmount" column="total_amount"/>
         <result property="status" column="status"/>
-        <result property="shippingAddress" column="shipping_address"/>
+        <result property="username" column="username"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
         <result property="createTime" column="create_time"/>
-        
-        <!-- 关联用户信息 -->
-        <association property="user" javaType="User">
-            <id property="id" column="user_id"/>
-            <result property="username" column="username"/>
-            <result property="email" column="email"/>
-            <result property="phone" column="phone"/>
-            <result property="address" column="address"/>
-        </association>
-        
+
         <!-- 关联订单项 -->
         <collection property="orderItems" ofType="OrderItem">
-            <id property="id" column="item_id"/>
-            <result property="orderId" column="order_id"/>
-            <result property="productId" column="product_id"/>
+            <id property="id" column="i_id"/>
+            <result property="oid" column="id"/>
+            <result property="pid" column="pid"/>
+            <result property="price" column="price"/>
             <result property="quantity" column="quantity"/>
-            <result property="productName" column="product_name"/>
-            <result property="productPrice" column="product_price"/>
             <result property="subtotal" column="subtotal"/>
-            <result property="price" column="item_price"/>
-            
-            <!-- 关联商品信息 -->
-            <association property="product" javaType="Product">
-                <id property="id" column="product_id"/>
-                <result property="name" column="p_name"/>
-                <result property="description" column="p_description"/>
-                <result property="price" column="p_price"/>
-                <result property="image" column="p_image"/>
-                <result property="stock" column="p_stock"/>
-                <result property="sales" column="p_sales"/>
-                <result property="status" column="p_status"/>
-            </association>
+            <result property="productName" column="product_name"/>
+            <result property="productDescription" column="product_description"/>
+            <result property="productPrice" column="product_price"/>
+            <result property="productImage" column="product_image"/>
         </collection>
     </resultMap>
 
     <!-- 查询所有订单 -->
     <select id="findAll" resultMap="OrderResultMap">
-        SELECT o.*, u.username, u.email, u.phone, u.address
+        SELECT o.*
         FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
         ORDER BY o.create_time DESC
     </select>
 
     <!-- 根据ID查询订单 -->
     <select id="findById" parameterType="int" resultMap="OrderResultMap">
-        SELECT o.id, o.user_id, o.total_amount, o.status, o.shipping_address, o.create_time,
-               u.username, u.email, u.phone, u.address,
-               oi.id as item_id, oi.order_id, oi.product_id, oi.quantity, 
-               oi.product_name, oi.product_price, oi.subtotal, oi.price as item_price,
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.image as p_image, p.stock as p_stock, p.sales as p_sales, p.status as p_status
+        SELECT o.id, o.user_id, o.total_amount, o.status, o.username, o.address, o.phone, o.create_time,
+               i.id as i_id, i.pid, i.price, i.quantity, i.subtotal, i.product_name, i.product_description, i.product_price, i.product_image
         FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
-        LEFT JOIN order_items oi ON o.id = oi.order_id
-        LEFT JOIN products p ON oi.product_id = p.id
+        LEFT JOIN order_items i ON o.id = i.oid
         WHERE o.id = #{id}
-        ORDER BY oi.id
+        ORDER BY i.id
     </select>
 
     <!-- 根据用户ID查询订单 -->
     <select id="findByUserId" parameterType="int" resultMap="OrderResultMap">
-        SELECT o.id, o.user_id, o.total_amount, o.status, o.shipping_address, o.create_time,
-               u.username, u.email, u.phone, u.address,
-               oi.id as item_id, oi.order_id, oi.product_id, oi.quantity, 
-               oi.product_name, oi.product_price, oi.subtotal, oi.price as item_price,
-               p.name as p_name, p.description as p_description, p.price as p_price,
-               p.image as p_image, p.stock as p_stock, p.sales as p_sales, p.status as p_status
+        SELECT o.id, o.user_id, o.total_amount, o.status, o.username, o.address, o.phone, o.create_time,
+               i.id as i_id, i.pid, i.price, i.quantity, i.subtotal, i.product_name, i.product_description, i.product_price, i.product_image
         FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
-        LEFT JOIN order_items oi ON o.id = oi.order_id
-        LEFT JOIN products p ON oi.product_id = p.id
+        LEFT JOIN order_items i ON o.id = i.oid
         WHERE o.user_id = #{userId}
-        ORDER BY o.create_time DESC, oi.id
+        ORDER BY o.create_time DESC, i.id
     </select>
 
     <!-- 根据状态查询订单 -->
-    <select id="findByStatus" parameterType="int" resultMap="OrderResultMap">
-        SELECT o.*, u.username, u.email, u.phone, u.address
+    <select id="findByStatus" parameterType="string" resultMap="OrderResultMap">
+        SELECT o.id, o.user_id, o.total_amount, o.status, o.username, o.address, o.phone, o.create_time,
+               i.id as i_id, i.pid, i.price, i.quantity, i.subtotal, i.product_name, i.product_description, i.product_price, i.product_image
         FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
+        LEFT JOIN order_items i ON o.id = i.oid
         WHERE o.status = #{status}
-        ORDER BY o.create_time DESC
-    </select>
-    
-    <!-- 根据用户ID和日期范围查询订单 -->
-    <select id="findByUserIdAndDateRange" resultMap="OrderResultMap">
-        SELECT o.*, u.username, u.email, u.phone, u.address
-        FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
-        WHERE o.user_id = #{userId}
-        <if test="startDate != null">
-            AND o.create_time &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-            AND o.create_time &lt;= #{endDate}
-        </if>
         ORDER BY o.create_time DESC
     </select>
 
@@ -130,10 +86,14 @@
         SELECT COUNT(*) FROM orders WHERE user_id = #{userId}
     </select>
 
+    <select id="findByUserIdAndStatus" resultType="com.shop.entity.Order">
+        SELECT * FROM orders WHERE user_id = #{userId} AND status = #{status}
+    </select>
+
     <!-- 插入订单 -->
     <insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO orders (user_id, total_amount, status, shipping_address, create_time)
-        VALUES (#{userId}, #{totalAmount}, #{status}, #{shippingAddress}, #{createTime})
+        INSERT INTO orders (user_id, total_amount, status, username, phone, address, create_time)
+        VALUES (#{userId}, #{totalAmount}, #{status}, #{username}, #{phone}, #{address}, #{createTime})
     </insert>
 
     <!-- 更新订单 -->

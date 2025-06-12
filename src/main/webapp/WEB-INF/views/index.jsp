@@ -10,6 +10,7 @@
   <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/all.min.css" rel="stylesheet">
   <link href="${pageContext.request.contextPath}/static/css/style.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/static/css/product-card.css" rel="stylesheet">
 </head>
 <body>
 <jsp:include page="common/toast.jsp"/>
