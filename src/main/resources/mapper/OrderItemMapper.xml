@@ -4,17 +4,6 @@
 
 <mapper namespace="com.shop.mapper.OrderItemMapper">
 
-    <!-- 根据订单ID查询订单明细 -->
-    <select id="findByOrderId" parameterType="int" resultType="com.shop.entity.OrderItem">
-        SELECT * from order_items where oid = #{orderId};
-    </select>
-
-    <!-- 添加订单明细 -->
-    <insert id="insert" parameterType="com.shop.entity.OrderItem" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO order_items (oid, pid, price, quantity, subtotal, product_name, product_description, product_price, product_image)
-        VALUES (#{oid}, #{pid}, #{price}, #{quantity}, #{subtotal}, #{productName}, #{productDescription}, #{productPrice}, #{productImage});
-    </insert>
-
     <!-- 批量添加订单明细 -->
     <insert id="batchInsert" parameterType="list">
         INSERT INTO order_items (oid, pid, price, quantity, subtotal, product_name, product_description, product_price, product_image)
@@ -23,10 +12,5 @@
             (#{item.oid}, #{item.pid}, #{item.price}, #{item.quantity}, #{item.subtotal}, #{item.productName}, #{item.productDescription}, #{item.productPrice}, #{item.productImage})
         </foreach>
     </insert>
-
-    <!-- 删除订单明细 -->
-    <delete id="deleteByOrderId" parameterType="int">
-        DELETE FROM order_items WHERE oid = #{orderId};
-    </delete>
 
 </mapper>

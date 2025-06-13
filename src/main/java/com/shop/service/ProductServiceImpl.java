@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
         if (limit <= 0) {
             limit = 10;
         }
-        return productMapper.getHotProducts(limit);
+        return productMapper.findHotProducts(limit);
     }
     
     @Override
@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
         if (limit <= 0) {
             limit = 10;
         }
-        return productMapper.getLatestProducts(limit);
+        return productMapper.findLatestProducts(limit);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
             size = 10;
         }
         int offset = (page - 1) * size;
-        return productMapper.getByPage(offset, size, sort);
+        return productMapper.findByPage(offset, size, sort);
     }
     
     @Override
@@ -72,6 +72,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<String> getSuggestions(String keyword, int limit) {
-        return productMapper.getSuggestions(keyword.trim(), limit);
+        return productMapper.findByKeyword(keyword.trim(), limit);
     }
 }

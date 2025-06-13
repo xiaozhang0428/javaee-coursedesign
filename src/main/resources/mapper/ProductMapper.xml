@@ -40,18 +40,18 @@
         </choose>
     </select>
 
-    <select id="getHotProducts" parameterType="int" resultType="Product">
+    <select id="findHotProducts" parameterType="int" resultType="Product">
         SELECT * FROM products ORDER BY sales DESC LIMIT #{limit}
     </select>
 
-    <select id="getLatestProducts" parameterType="int" resultType="Product">
+    <select id="findLatestProducts" parameterType="int" resultType="Product">
         SELECT *
         FROM products
         ORDER BY id DESC
         LIMIT #{limit}
     </select>
 
-    <select id="getByPage" resultType="Product">
+    <select id="findByPage" resultType="Product">
         SELECT * FROM products
         <choose>
             <when test="sort == 'price_asc'">
@@ -88,7 +88,7 @@
     </update>
 
     <!-- 获取搜索建议（自动补全） -->
-    <select id="getSuggestions" resultType="string">
+    <select id="findByKeyword" resultType="string">
         SELECT DISTINCT name FROM products 
         WHERE(
             name LIKE CONCAT(#{keyword}, '%') OR 

@@ -23,17 +23,17 @@ public interface ProductMapper {
     /**
      * 查询热销商品
      */
-    List<Product> getHotProducts(@Param("limit") int limit);
+    List<Product> findHotProducts(@Param("limit") int limit);
 
     /**
      * 查询最新商品
      */
-    List<Product> getLatestProducts(@Param("limit") int limit);
+    List<Product> findLatestProducts(@Param("limit") int limit);
 
     /**
      * 查询商品
      */
-    List<Product> getByPage(@Param("offset") int offset, @Param("limit") int limit, @Param("sort") String sort);
+    List<Product> findByPage(@Param("offset") int offset, @Param("limit") int limit, @Param("sort") String sort);
 
     /**
      * 统计商品总数
@@ -46,7 +46,7 @@ public interface ProductMapper {
     int update(Product product);
 
     /**
-     * 获取搜索建议（自动补全）
+     * 获取搜索建议
      */
-    List<String> getSuggestions(@Param("keyword") String keyword, @Param("limit") int limit);
+    List<String> findByKeyword(@Param("keyword") String keyword, @Param("limit") int limit);
 }

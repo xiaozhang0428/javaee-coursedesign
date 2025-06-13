@@ -30,13 +30,6 @@
         </collection>
     </resultMap>
 
-    <!-- 查询所有订单 -->
-    <select id="findAll" resultMap="OrderResultMap">
-        SELECT o.*
-        FROM orders o
-        ORDER BY o.create_time DESC
-    </select>
-
     <!-- 根据ID查询订单 -->
     <select id="findById" parameterType="int" resultMap="OrderResultMap">
         SELECT o.id, o.user_id, o.total_amount, o.status, o.username, o.address, o.phone, o.create_time,
@@ -57,35 +50,6 @@
         ORDER BY o.create_time DESC, i.id
     </select>
 
-    <!-- 根据状态查询订单 -->
-    <select id="findByStatus" parameterType="string" resultMap="OrderResultMap">
-        SELECT o.id, o.user_id, o.total_amount, o.status, o.username, o.address, o.phone, o.create_time,
-               i.id as i_id, i.pid, i.price, i.quantity, i.subtotal, i.product_name, i.product_description, i.product_price, i.product_image
-        FROM orders o
-        LEFT JOIN order_items i ON o.id = i.oid
-        WHERE o.status = #{status}
-        ORDER BY o.create_time DESC
-    </select>
-
-    <!-- 分页查询订单 -->
-    <select id="findByPage" resultMap="OrderResultMap">
-        SELECT o.*, u.username, u.email, u.phone, u.address
-        FROM orders o
-        LEFT JOIN users u ON o.user_id = u.id
-        ORDER BY o.create_time DESC
-        LIMIT #{offset}, #{size}
-    </select>
-
-    <!-- 统计订单总数 -->
-    <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM orders
-    </select>
-
-    <!-- 根据用户ID统计订单数 -->
-    <select id="countByUserId" parameterType="int" resultType="int">
-        SELECT COUNT(*) FROM orders WHERE user_id = #{userId}
-    </select>
-
     <select id="findByUserIdAndStatus" resultType="com.shop.entity.Order">
         SELECT * FROM orders WHERE user_id = #{userId} AND status = #{status}
     </select>
@@ -96,29 +60,9 @@
         VALUES (#{userId}, #{totalAmount}, #{status}, #{username}, #{phone}, #{address}, #{createTime})
     </insert>
 
-    <!-- 更新订单 -->
-    <update id="update" parameterType="Order">
-        UPDATE orders
-        <set>
-            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
-            <if test="status != null">status = #{status},</if>
-        </set>
-        WHERE id = #{id}
-    </update>
-
     <!-- 更新订单状态 -->
     <update id="updateStatus">
         UPDATE orders SET status = #{status} WHERE id = #{id}
     </update>
-
-    <!-- 删除订单 -->
-    <delete id="deleteById" parameterType="int">
-        DELETE FROM orders WHERE id = #{id}
-    </delete>
-
-    <!-- 根据用户ID删除订单 -->
-    <delete id="deleteByUserId" parameterType="int">
-        DELETE FROM orders WHERE user_id = #{userId}
-    </delete>
 
 </mapper>

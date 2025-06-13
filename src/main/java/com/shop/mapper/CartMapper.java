@@ -34,9 +34,4 @@ public interface CartMapper {
      * 删除购物车项
      */
     int deleteByUserIdAndProductId(@Param("userId") int userId, @Param("productId") int productId);
-    
-    /**
-     * 清空用户购物车
-     */
-    int deleteByUserId(int userId);
 }
